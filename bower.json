@@ -1,0 +1,22 @@
+{
+  "name": "ez-gridster",
+  "version": "0.0.1",
+  "main": [
+    "dist/ez-gridster.min.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "devDependencies": {
+    "jquery": "latest",
+    "angular": "latest",
+    "gridster": "latest",
+    "angular-mocks": "latest"
+  },
+  "dependencies": {
+    "jquery-ui": "~1.10.3",
+    "angular": "~1.2.6"
+  }
+}

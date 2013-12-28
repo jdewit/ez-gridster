@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <link href="bower_components/gridster/dist/jquery.gridster.css" rel="stylesheet">
+
+  <style>
+    ul {
+      list-style: none;
+    }
+    .box {
+      border: 1px solid #ccc; 
+      background-color: #fff;
+    }
+    .box-header {
+      background-color: #eee;
+      padding: 0 10px;
+      border-bottom: 1px solid #ccc; 
+      cursor: move;
+    }
+    .box-header h3 {
+      margin-top: 10px;
+      display: inline-block;
+    }
+    .box-content {
+      padding: 10px;
+    }
+    .box-header a {
+      color: #ccc;
+      margin-top: 10px;
+    }
+    a {
+      cursor: pointer;
+    }
+  </style>
+
+  <script type="text/javascript" src="bower_components/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
+  <script type="text/javascript" src="bower_components/gridster/dist/jquery.gridster.min.js"></script>
+
+  <script src="bower_components/angular/angular.min.js"></script>
+
+  <script src="src/ez-gridster.js"></script>
+  <script src="dist/ez-gridster-tpl.js"></script>
+
+  <script>
+      angular.module('myApp', ['ez.gridster'])
+
+      .controller('AppCtrl', ['$scope', 'gridsterConfig', function AppCtrl($scope, gridsterConfig){
+
+        gridsterConfig.resize.stop = function() {
+          alert('resized');
+        };
+
+        gridsterConfig.draggable.stop = function() {
+          alert('dragged');
+        };
+
+        $scope.widgets = [ 
+          {
+            col : 1,
+            row: 1,
+            sizey: 1,
+            sizex: 1,
+            name: "FOO"
+          },
+          {
+            col : 2,
+            row: 1,
+            sizey: 1,
+            sizex: 1,
+            name: "Bar"
+          } 
+        ];
+
+        $scope.addWidget = function() {
+          $scope.$broadcast('ez-gridster.add_widget', {
+            name: "New"
+          });
+        };
+      }]);
+
+  </script>
+</head>
+<body ng-app="myApp">
+  <div ng-controller="AppCtrl">
+    <div gridster class="gridster" widgets="widgets"></div>
+    <hr>
+    <a ng-click="addWidget()">Add Widget</a>
+  </div>
+</body>
+
+</html>
+
