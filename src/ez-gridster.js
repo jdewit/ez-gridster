@@ -21,10 +21,6 @@ angular.module('ez.gridster', [])
     templateUrl: 'ez-gridster-tpl.html',
     link: function(scope, $element) {
       gridster.add_widget($element);
-
-      scope.$on('$destroy', function() {
-  alert('destroy');
-      });
     }
   };
 }])

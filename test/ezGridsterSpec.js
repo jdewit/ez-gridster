@@ -9,6 +9,12 @@ describe('ez-gridster', function() {
 		$templateCache.put('ez-gridster.html', template);
     _timeout = $timeout;
 
+    //gridster = {
+      //add_widget: function() {
+        //$(this).append('<li></li>');
+      //}
+    //};
+
     _scope = $rootScope.$new();
 
     el = angular.element('<div><div class="gridster" gridster widgets="widgets"></div></div>');
@@ -46,10 +52,14 @@ describe('ez-gridster', function() {
     assert.lengthOf(el.find('li'), 3);
   });
 
-  it('should remove widget from scope & gridster via remove method', function() {
+  it('should remove widget from scope & gridster via remove method', function(done) {
     el.find('a').first().click();
     _timeout.flush();
+    _scope.$digest();
 
-    assert.lengthOf(el.find('li'), 1);
+    setTimeout(function() { // need to wait for gridster to use callback
+      done();
+      assert.lengthOf(el.find('li'), 1);
+    }, 1000);
   });
 });

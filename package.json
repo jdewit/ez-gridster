@@ -14,9 +14,6 @@
     "npm": "1.2.x"
   },
   "scripts": {},
-  "dependencies": {
-    "karma-chai": "0.0.2"
-  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "latest",
@@ -28,11 +25,12 @@
     "karma-script-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
     "karma-chrome-launcher": "~0.1.0",
-    "karma-jasmine": "~0.1.3",
-    "karma-requirejs": "~0.1.0",
+    "karma-mocha": "latest",
+    "karma-chai": "0.0.2",
     "karma-phantomjs-launcher": "~0.1.0",
     "karma": "~0.10.4",
     "grunt-bump": "0.0.11",
-    "grunt-angular-templates": "~0.4.7"
+    "grunt-angular-templates": "~0.4.7",
+    "karma-coverage": "~0.1.4"
   }
 }
