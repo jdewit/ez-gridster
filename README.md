@@ -1,6 +1,8 @@
 EZ-GRIDSTER
 ===========
 
+An angular gridster directive.
+
 ##Installation
 
 ```bash
