@@ -9,15 +9,9 @@ describe('ez-gridster', function() {
 		$templateCache.put('ez-gridster.html', template);
     _timeout = $timeout;
 
-    //gridster = {
-      //add_widget: function() {
-        //$(this).append('<li></li>');
-      //}
-    //};
-
     _scope = $rootScope.$new();
 
-    el = angular.element('<div><div class="gridster" gridster widgets="widgets"></div></div>');
+    el = angular.element('<div class="gridster" ez-gridster widgets="widgets"></div>');
 
     _scope.widgets = [
       {
@@ -46,20 +40,26 @@ describe('ez-gridster', function() {
 
   it('should add widget to scope & gridster via controller broadcast event', function() {
     _scope.$apply(function() {
-      _scope.$broadcast('ez-gridster.add_widget', {name: 'Test new widget'});
+      _scope.$broadcast('ez_gridster.add_widget', {name: 'Test new widget'});
     });
 
     assert.lengthOf(el.find('li'), 3);
   });
 
   it('should remove widget from scope & gridster via remove method', function(done) {
-    el.find('a').first().click();
     _timeout.flush();
-    _scope.$digest();
+    var eventCount = 0;
+
+    _scope.$on('ez_gridster.widget_removed', function() {
+      eventCount++;
+    });
 
     setTimeout(function() { // need to wait for gridster to use callback
-      done();
+      el.isolateScope().removeWidget(_scope.widgets[0], 0);
       assert.lengthOf(el.find('li'), 1);
+      assert.lengthOf(_scope.widgets, 1);
+      assert.equal(eventCount, 1);
+      done();
     }, 1000);
   });
 });

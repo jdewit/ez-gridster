@@ -12,7 +12,7 @@
   "devDependencies": {
     "jquery": "latest",
     "angular": "latest",
-    "gridster": "latest",
+    "gridster": "~0.2.1",
     "angular-mocks": "latest"
   },
   "dependencies": {

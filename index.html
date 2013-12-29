@@ -2,11 +2,17 @@
 <html>
 
 <head>
-  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
   <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-  <link href="//cdnjs.cloudflare.com/ajax/libs/jquery.gridster/0.1.0/jquery.gridster.min.css" rel="stylesheet">
+  <link href="//rawgithub.com/ducksboard/gridster.js/master/dist/jquery.gridster.min.css" rel="stylesheet">
 
   <style>
+    body {
+      padding: 0 10px;
+    }
+    .page-header {
+      margin-top: 20px;
+    }
     ul {
       list-style: none;
     }
@@ -38,7 +44,7 @@
 
   <script type="text/javascript" src="//code.jquery.com/jquery-1.9.1.js"></script>
   <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.gridster/0.1.0/jquery.gridster.min.js"></script>
+  <script type="text/javascript" src="//rawgithub.com/ducksboard/gridster.js/master/dist/jquery.gridster.min.js"></script>
 
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
 
@@ -64,20 +70,20 @@
             row: 1,
             sizey: 1,
             sizex: 1,
-            name: "FOO"
+            name: "Widget 1"
           },
           {
             col : 2,
             row: 1,
             sizey: 1,
             sizex: 1,
-            name: "Bar"
+            name: "Widget 2"
           } 
         ];
 
         $scope.addWidget = function() {
-          $scope.$broadcast('ez-gridster.add_widget', {
-            name: "New"
+          $scope.$broadcast('ez_gridster.add_widget', {
+            name: "New Widget"
           });
         };
       }]);
@@ -86,9 +92,11 @@
 </head>
 <body ng-app="myApp">
   <div ng-controller="AppCtrl">
-    <div gridster class="gridster" widgets="widgets"></div>
-    <hr>
-    <a ng-click="addWidget()">Add Widget</a>
+    <div class="page-header">
+      <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
+      <h1>ez-gridster</h1>
+    </div>
+    <div ez-gridster class="gridster" widgets="widgets"></div>
   </div>
 </body>
 

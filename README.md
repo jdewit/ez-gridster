@@ -8,7 +8,7 @@ $ bower install ez-gridster
 ```
 
 ##Demo
-
+http://embed.plnkr.co/qFNEAI/preview
 
 ##Thanks To
 
