@@ -11,7 +11,7 @@ describe('ez-gridster', function() {
 
     _scope = $rootScope.$new();
 
-    el = angular.element('<div class="gridster" ez-gridster="widgets"></div>');
+    el = angular.element('<div class="gridster" ez-gridster="widgets" ez-gridster-options="{resize: {enabled: false}}"></div>');
 
     _scope.widgets = [
       {
@@ -39,12 +39,22 @@ describe('ez-gridster', function() {
     assert.isTrue(el.hasClass('gridster'));
   });
 
+  it('should be able to override options', function() {
+    assert.isFalse(el.isolateScope().options.resize.enabled);
+  });
+
   it('should add widget to scope & gridster via controller broadcast event', function() {
+    var eventCount = 0;
+    _scope.$on('ez_gridster.widget_added', function() {
+      eventCount++;
+    });
+
     _scope.$apply(function() {
       _scope.$broadcast('ez_gridster.add_widget', {name: 'Test new widget'});
     });
 
     assert.lengthOf(el.find('li'), 3);
+    assert.equal(eventCount, 1);
   });
 
   it('should remove widget from scope & gridster via remove method', function(done) {

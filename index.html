@@ -54,14 +54,20 @@
   <script>
       angular.module('myApp', ['ez.gridster'])
 
-      .controller('AppCtrl', ['$scope', 'gridsterConfig', function AppCtrl($scope, gridsterConfig){
+      .controller('AppCtrl', ['$scope', function AppCtrl($scope){
 
-        gridsterConfig.resize.stop = function() {
-          alert('resized');
-        };
 
-        gridsterConfig.draggable.stop = function() {
-          alert('dragged');
+        $scope.oxptions = {
+          resize: {
+            stop: function() {
+              alert('resized');
+            }
+          },
+          draggable: {
+            stop: function() {
+              alert('dragged');
+            }
+          }
         };
 
         $scope.widgets = [
@@ -82,10 +88,16 @@
         ];
 
         $scope.addWidget = function() {
-          $scope.$broadcast('ez_gridster.add_widget', {
-            name: "New Widget"
-          });
+          $scope.$broadcast('ez_gridster.add_widget', {name: "New Widget"});
         };
+
+        $scope.$on('ez_gridster.widget_added', function(e, widget) {
+          console.log('save the widget to your db', widget);
+        });
+
+        $scope.$on('ez_gridster.widget_removed', function(e, widget, index) {
+          console.log('remove widget in db', widget);
+        });
       }]);
 
   </script>
@@ -96,7 +108,7 @@
       <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
       <h1>ez-gridster</h1>
     </div>
-    <div ez-gridster="widgets"></div>
+    <div ez-gridster="widgets" ez-gridster-options="options"></div>
   </div>
 </body>
 

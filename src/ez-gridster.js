@@ -4,17 +4,17 @@ var gridster;
 
 angular.module('ez.gridster', [])
 
-.constant('gridsterConfig', {
+.constant('ezGridsterConfig', {
   widget_base_dimensions: [400, 300],
   widget_margins: [5, 5],
   widget_selector: 'li',
   helper: 'clone',
   draggable: {},
+  remove: {
+    silent: true
+  },
   resize: {
     enabled: true
-  },
-  removeWidget: function(widget, index, callback) {
-    callback();
   }
 })
 
@@ -30,28 +30,17 @@ angular.module('ez.gridster', [])
   };
 }])
 
-.directive('ezGridster', ['$timeout', 'gridsterConfig', function ($timeout, gridsterConfig) {
+.directive('ezGridster', ['$timeout', 'ezGridsterConfig', function ($timeout, ezGridsterConfig) {
   return {
     restrict: 'AE',
     scope: {
       widgets: '=ezGridster'
     },
     template: '<ul><li class="gs-w box" ez-gridster-widget ng-repeat="widget in widgets" data-col="{{ widget.col }}" data-row="{{ widget.row }}" data-sizex="{{ widget.sizex }}" data-sizey="{{ widget.sizey }}"></li></ul>',
-    link: function (scope, $element, $attributes) {
-      var options = angular.extend(gridsterConfig, scope.$eval($attributes.gridsterOptions));
+    link: function (scope, $element, attrs) {
+      scope.options = angular.extend( ezGridsterConfig, (scope.$parent.$eval(attrs.ezGridsterOptions) || []) );
 
-      gridster = $element.addClass('gridster').find('ul').gridster(options).data('gridster');
-
-      scope.removeWidget = function(widget, index) {
-        gridsterConfig.removeWidget(widget, index, function() {
-          gridster.remove_widget($element.find('li').eq(index), true, function() {
-            scope.widgets.splice(index, 1);
-
-            scope.$emit('ez_gridster.widget_removed', widget);
-            scope.$digest();
-          });
-        });
-      };
+      gridster = $element.addClass('gridster').find('ul').gridster(scope.options).data('gridster');
 
       scope.$on('ez_gridster.add_widget', function(e, widget) {
         var size_x = widget.size_x || 1,
@@ -60,7 +49,18 @@ angular.module('ez.gridster', [])
         widget = angular.extend(widget, gridster.next_position(size_x, size_y));
 
         scope.widgets.push(widget);
+
+        scope.$emit('ez_gridster.widget_added', widget);
       });
+
+      scope.removeWidget = function(widget, index) {
+        gridster.remove_widget($element.find('li').eq(index), scope.options.remove.silent, function() {
+          scope.widgets.splice(index, 1);
+          scope.$digest();
+
+          scope.$emit('ez_gridster.widget_removed', widget, index);
+        });
+      };
     }
   };
 
