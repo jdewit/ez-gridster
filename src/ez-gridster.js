@@ -36,17 +36,17 @@ angular.module('ez.gridster', [])
     scope: {
       widgets: '=ezGridster'
     },
-    template: '<ul><li class="gs-w box" ez-gridster-widget ng-repeat="widget in widgets" data-col="{{ widget.col }}" data-row="{{ widget.row }}" data-sizex="{{ widget.sizex }}" data-sizey="{{ widget.sizey }}"></li></ul>',
+    template: '<ul><li class="gs-w box" ez-gridster-widget ng-repeat="widget in widgets" data-col="{{ widget.col }}" data-row="{{ widget.row }}" data-sizex="{{ widget.width }}" data-sizey="{{ widget.height }}"></li></ul>',
     link: function (scope, $element, attrs) {
       scope.options = angular.extend( ezGridsterConfig, (scope.$parent.$eval(attrs.ezGridsterOptions) || []) );
 
       gridster = $element.addClass('gridster').find('ul').gridster(scope.options).data('gridster');
 
       scope.$on('ez_gridster.add_widget', function(e, widget) {
-        var size_x = widget.size_x || 1,
-            size_y = widget.size_y || 1;
+        var width = widget.width || 1,
+            height = widget.height || 1;
 
-        widget = angular.extend(widget, gridster.next_position(size_x, size_y));
+        widget = angular.extend(widget, gridster.next_position(width, height));
 
         scope.widgets.push(widget);
 
