@@ -34,13 +34,13 @@ angular.module('ez.gridster', [])
   return {
     restrict: 'AE',
     scope: {
-      widgets: '=widgets'
+      widgets: '=ezGridster'
     },
     template: '<ul><li class="gs-w box" ez-gridster-widget ng-repeat="widget in widgets" data-col="{{ widget.col }}" data-row="{{ widget.row }}" data-sizex="{{ widget.sizex }}" data-sizey="{{ widget.sizey }}"></li></ul>',
     link: function (scope, $element, $attributes) {
       var options = angular.extend(gridsterConfig, scope.$eval($attributes.gridsterOptions));
 
-      gridster = $element.find('ul').gridster(options).data('gridster');
+      gridster = $element.addClass('gridster').find('ul').gridster(options).data('gridster');
 
       scope.removeWidget = function(widget, index) {
         gridsterConfig.removeWidget(widget, index, function() {

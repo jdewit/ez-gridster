@@ -17,13 +17,13 @@
       list-style: none;
     }
     .box {
-      border: 1px solid #ccc; 
+      border: 1px solid #ccc;
       background-color: #fff;
     }
     .box-header {
       background-color: #eee;
       padding: 0 10px;
-      border-bottom: 1px solid #ccc; 
+      border-bottom: 1px solid #ccc;
       cursor: move;
     }
     .box-header h3 {
@@ -64,7 +64,7 @@
           alert('dragged');
         };
 
-        $scope.widgets = [ 
+        $scope.widgets = [
           {
             col : 1,
             row: 1,
@@ -78,7 +78,7 @@
             sizey: 1,
             sizex: 1,
             name: "Widget 2"
-          } 
+          }
         ];
 
         $scope.addWidget = function() {
@@ -96,7 +96,7 @@
       <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
       <h1>ez-gridster</h1>
     </div>
-    <div ez-gridster class="gridster" widgets="widgets"></div>
+    <div ez-gridster="widgets"></div>
   </div>
 </body>
 

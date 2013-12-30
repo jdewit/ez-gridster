@@ -11,7 +11,7 @@ describe('ez-gridster', function() {
 
     _scope = $rootScope.$new();
 
-    el = angular.element('<div class="gridster" ez-gridster widgets="widgets"></div>');
+    el = angular.element('<div class="gridster" ez-gridster="widgets"></div>');
 
     _scope.widgets = [
       {
@@ -36,6 +36,7 @@ describe('ez-gridster', function() {
 
   it('should init gridster widgets', function() {
     assert.lengthOf(el.find('li'), 2);
+    assert.isTrue(el.hasClass('gridster'));
   });
 
   it('should add widget to scope & gridster via controller broadcast event', function() {
