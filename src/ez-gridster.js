@@ -53,6 +53,12 @@ angular.module('ez.gridster', [])
         scope.$emit('ez_gridster.widget_added', widget);
       });
 
+      scope.$on('ez_gridster.clear', function() {
+        gridster.remove_all_widgets(function() {
+          scope.widgets = [];
+        });
+      });
+
       scope.removeWidget = function(widget, index) {
         gridster.remove_widget($element.find('li').eq(index), scope.options.remove.silent, function() {
           scope.widgets.splice(index, 1);

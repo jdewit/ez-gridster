@@ -71,6 +71,20 @@ describe('ez-gridster', function() {
       assert.lengthOf(_scope.widgets, 1);
       assert.equal(eventCount, 1);
       done();
-    }, 1000);
+    }, 500);
+  });
+
+  it('should clear gridster on event', function(done) {
+    _timeout.flush();
+    assert.lengthOf(el.find('li'), 2);
+    assert.lengthOf(_scope.widgets, 2);
+    _scope.$broadcast('ez_gridster.clear');
+
+    setTimeout(function() { // need to wait for gridster to use callback
+      _scope.$digest();
+      assert.lengthOf(el.find('li'), 0);
+      assert.lengthOf(_scope.widgets, 0);
+      done();
+    }, 500);
   });
 });
