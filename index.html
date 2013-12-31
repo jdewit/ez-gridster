@@ -17,13 +17,13 @@
       list-style: none;
     }
     .box {
-      border: 1px solid #ccc; 
+      border: 1px solid #ccc;
       background-color: #fff;
     }
     .box-header {
       background-color: #eee;
       padding: 0 10px;
-      border-bottom: 1px solid #ccc; 
+      border-bottom: 1px solid #ccc;
       cursor: move;
     }
     .box-header h3 {
@@ -54,39 +54,102 @@
   <script>
       angular.module('myApp', ['ez.gridster'])
 
-      .controller('AppCtrl', ['$scope', 'gridsterConfig', function AppCtrl($scope, gridsterConfig){
+      .controller('AppCtrl', ['$scope', function AppCtrl($scope){
 
-        gridsterConfig.resize.stop = function() {
-          alert('resized');
-        };
-
-        gridsterConfig.draggable.stop = function() {
-          alert('dragged');
-        };
-
-        $scope.widgets = [ 
-          {
-            col : 1,
-            row: 1,
-            sizey: 1,
-            sizex: 1,
-            name: "Widget 1"
+        $scope.options = {
+          resize: {
+            enabled: true,
+            stop: function() {
+              alert('resized');
+            }
           },
-          {
-            col : 2,
-            row: 1,
-            sizey: 1,
-            sizex: 1,
-            name: "Widget 2"
-          } 
-        ];
+          draggable: {
+            stop: function() {
+              alert('dragged');
+            }
+          }
+        };
+
+        $scope.dashboards = {
+          '1': {
+            id: '1',
+            name: 'Home',
+            widgets: [
+              {
+                col : 1,
+                row: 1,
+                sizey: 1,
+                sizex: 1,
+                name: "Widget 1"
+              },
+              {
+                col : 2,
+                row: 1,
+                sizey: 1,
+                sizex: 1,
+                name: "Widget 2"
+              }
+            ]
+          },
+          '2': {
+            id: '2',
+            name: 'Other',
+            widgets: [
+              {
+                col : 1,
+                row: 1,
+                sizey: 1,
+                sizex: 2,
+                name: "Other Widget 1"
+              },
+              {
+                col : 2,
+                row: 2,
+                sizey: 1,
+                sizex: 1,
+                name: "Other Widget 2"
+              }
+            ]
+          }
+        };
+
+        $scope.widgets = [];
 
         $scope.addWidget = function() {
-          $scope.$broadcast('ez_gridster.add_widget', {
-            name: "New Widget"
-          });
+          $scope.$broadcast('ez_gridster.add_widget', {name: "New Widget"});
         };
-      }]);
+
+        $scope.clear = function() {
+          $scope.$broadcast('ez_gridster.clear');
+        };
+
+        $scope.$on('ez_gridster.widget_added', function(e, widget) {
+          console.log('save the widget to your db', widget);
+        });
+
+        $scope.$on('ez_gridster.widget_removed', function(e, widget, index) {
+          console.log('remove widget in db', widget);
+        });
+
+        $scope.$watch('selectedDashboardId', function(newVal, oldVal) {
+          $scope.$broadcast('ez_gridster.set', $scope.dashboards[newVal].widgets);
+        });
+
+        // init dashboard
+        $scope.selectedDashboardId = '1';
+      }])
+
+      // helper code
+      .filter('object2Array', function() {
+        return function(input) {
+          var out = [];
+          for(i in input){
+            out.push(input[i]);
+          }
+          return out;
+        }
+      })
+    ;
 
   </script>
 </head>
@@ -94,9 +157,13 @@
   <div ng-controller="AppCtrl">
     <div class="page-header">
       <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
-      <h1>ez-gridster</h1>
+      <a class="pull-right btn btn-warning" ng-click="clear()"><i class="icon-trash"></i> Clear</a>
+      <h1>ez-gridster
+        <select ng-change="changeDashboard()" ng-model="selectedDashboardId" ng-options="d.id as d.name for d in dashboards | object2Array | orderBy:'id'">
+        </select>
+      </h1>
     </div>
-    <div ez-gridster class="gridster" widgets="widgets"></div>
+    <div ez-gridster="widgets" ez-gridster-options="options"></div>
   </div>
 </body>
 
