@@ -69,7 +69,7 @@
           }
         };
 
-        $scope.widgets = [
+        var widgets = [
           {
             col : 1,
             row: 1,
@@ -86,8 +86,18 @@
           }
         ];
 
+        $scope.widgets = widgets;
+
         $scope.addWidget = function() {
           $scope.$broadcast('ez_gridster.add_widget', {name: "New Widget"});
+        };
+
+        $scope.clear = function() {
+          $scope.widgets = [];
+        };
+
+        $scope.reload = function() {
+          $scope.widgets = widgets;
         };
 
         $scope.$on('ez_gridster.widget_added', function(e, widget) {
@@ -105,6 +115,8 @@
   <div ng-controller="AppCtrl">
     <div class="page-header">
       <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
+      <a class="pull-right btn btn-warning" ng-click="clear()"><i class="icon-trash"></i> Clear</a>
+      <a class="pull-right btn btn-notice" ng-click="reload()"><i class="icon-refresh"></i> Reload</a>
       <h1>ez-gridster</h1>
     </div>
     <div ez-gridster="widgets" ez-gridster-options="options"></div>

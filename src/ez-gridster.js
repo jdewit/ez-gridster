@@ -1,7 +1,5 @@
 'use strict';
 
-var gridster;
-
 angular.module('ez.gridster', [])
 
 .constant('ezGridsterConfig', {
@@ -18,13 +16,17 @@ angular.module('ez.gridster', [])
   }
 })
 
-.directive('ezGridsterWidget', ['$timeout', function($timeout) {
+.directive('ezGridsterWidget', ['$timeout', 'ezGridsterConfig', function($timeout, ezGridsterConfig) {
   return {
     restrict: 'AE',
     templateUrl: 'ez-gridster-tpl.html',
     link: function(scope, $element) {
       $timeout(function() { // update gridster after digest
-        gridster.add_widget($element);
+        scope.$parent.gridster.add_widget($element);
+      });
+
+      scope.$on('$destroy', function() {
+        scope.$parent.gridster.remove_widget($element);//, ezGridsterConfig.option.remove.silent);
       });
     }
   };
@@ -40,7 +42,7 @@ angular.module('ez.gridster', [])
     link: function (scope, $element, attrs) {
       scope.options = angular.extend( ezGridsterConfig, (scope.$parent.$eval(attrs.ezGridsterOptions) || []) );
 
-      gridster = $element.addClass('gridster').find('ul').gridster(scope.options).data('gridster');
+      scope.gridster = $element.addClass('gridster').find('ul').gridster(scope.options).data('gridster');
 
       scope.$on('ez_gridster.add_widget', function(e, widget) {
         var size_x = widget.size_x || 1,
@@ -53,19 +55,24 @@ angular.module('ez.gridster', [])
         scope.$emit('ez_gridster.widget_added', widget);
       });
 
-      scope.$on('ez_gridster.clear', function() {
-        gridster.remove_all_widgets(function() {
-          scope.widgets = [];
-        });
-      });
+      //scope.$on('ez_gridster.clear', function(e, callback) {
+//console.log('1', callback);
+        //scope.gridster.remove_all_widgets(function() {
+          ////scope.$apply(function() {
+            //scope.widgets = [];
+            //console.log('scope', scope);
+//console.log('cb', callback);
+            //if (callback) {
+              //callback();
+            //}
+            //scope.$digest();
+          ////});
+        //});
+      //});
 
       scope.removeWidget = function(widget, index) {
-        gridster.remove_widget($element.find('li').eq(index), scope.options.remove.silent, function() {
-          scope.widgets.splice(index, 1);
-          scope.$digest();
-
-          scope.$emit('ez_gridster.widget_removed', widget, index);
-        });
+        scope.widgets.splice(index, 1);
+        scope.$emit('ez_gridster.widget_removed', widget, index);
       };
     }
   };
