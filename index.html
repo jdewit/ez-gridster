@@ -57,18 +57,9 @@
       .controller('AppCtrl', ['$scope', function AppCtrl($scope){
 
         $scope.options = {
-          resize: {
-            enabled: true,
-            stop: function() {
-              alert('resized');
-            }
-          },
-          draggable: {
-            stop: function() {
-              alert('dragged');
-            }
-          }
+          widget_base_dimensions: [400, 300],
         };
+
 
         $scope.dashboards = {
           '1': {
@@ -129,6 +120,14 @@
 
         $scope.$on('ez_gridster.widget_removed', function(e, widget, index) {
           console.log('remove widget in db', widget);
+        });
+
+        $scope.$on('ez_gridster.widget_dragged', function() {
+          alert('dragged');
+        });
+
+        $scope.$on('ez_gridster.widget_resized', function() {
+          alert('resized');
         });
 
         $scope.$watch('selectedDashboardId', function(newVal, oldVal) {

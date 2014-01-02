@@ -38,6 +38,14 @@ angular.module('ez.gridster', [])
     link: function (scope, $element, attrs) {
       scope.options = angular.extend(ezGridsterConfig, scope.$parent.$eval(attrs.ezGridsterOptions));
 
+      scope.options.draggable.stop = function(e, ui, $widget) {
+        scope.$emit('ez_gridster.widget_dragged', e, ui, $widget);
+      };
+
+      scope.options.resize.stop = function(e, ui, $widget) {
+        scope.$emit('ez_gridster.widget_resized', e, ui, $widget);
+      };
+
       scope.gridster = $element.addClass('gridster').find('ul').gridster(scope.options).data('gridster');
 
       scope.$on('ez_gridster.add_widget', function(e, widget) {
