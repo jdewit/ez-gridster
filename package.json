@@ -2,7 +2,7 @@
   "name": "ez-gridster",
   "description": "Angular gridster directive",
   "keywords": [],
-  "version": "0.0.11",
+  "version": "0.1.0",
   "private": false,
   "author": "Joris de Wit",
   "repository": {
