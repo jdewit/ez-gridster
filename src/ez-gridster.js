@@ -59,6 +59,10 @@ angular.module('ez.gridster', [])
         scope.$emit('ez_gridster.widget_added', widget);
       });
 
+      scope.$on('ez_gridster.remove_widget', function(e, index) {
+        scope.removeWidget(index);
+      });
+
       scope.$on('ez_gridster.clear', function() {
         scope.gridster.remove_all_widgets();
         scope.widgets = [];
@@ -69,10 +73,11 @@ angular.module('ez.gridster', [])
         scope.widgets = widgets;
       });
 
-      scope.removeWidget = function(widget, index) {
+      scope.removeWidget = function(index) {
         scope.gridster.remove_widget($element.find('li.gs-w').eq(index), scope.options.remove.silent, function() {
-          scope.widgets.splice(index, 1);
-          scope.$emit('ez_gridster.widget_removed', widget, index);
+          var widget = scope.widgets.splice(index, 1);
+          scope.$emit('ez_gridster.widget_removed', widget);
+          scope.$digest();
         });
       };
     }

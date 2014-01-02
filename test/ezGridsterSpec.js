@@ -1,5 +1,5 @@
 describe('ez-gridster', function() {
-  var el, _scope, _timeout, widgets;
+  var el, _scope, _rootScope, _timeout, widgets;
 
   beforeEach(module('ez.gridster'));
 
@@ -10,6 +10,7 @@ describe('ez-gridster', function() {
     _timeout = $timeout;
 
     _scope = $rootScope.$new();
+    _rootScope = $rootScope;
 
     el = angular.element('<div class="gridster" ez-gridster="widgets" ez-gridster-options="{resize: {enabled: false}}"></div>');
 
@@ -68,7 +69,24 @@ describe('ez-gridster', function() {
     });
 
     setTimeout(function() { // need to wait for gridster to use callback
-      el.isolateScope().removeWidget(_scope.widgets[0], 0);
+      el.isolateScope().removeWidget(0);
+      assert.lengthOf(el.find('li'), 1);
+      assert.lengthOf(_scope.widgets, 1);
+      assert.equal(eventCount, 1);
+      done();
+    }, 500);
+  });
+
+  it('should remove widget from scope & gridster via  "ez_gridster.remove_widget" event', function(done) {
+    _timeout.flush();
+    var eventCount = 0;
+
+    _scope.$on('ez_gridster.widget_removed', function() {
+      eventCount++;
+    });
+
+    setTimeout(function() { // need to wait for gridster to use callback
+      _rootScope.$broadcast('ez_gridster.remove_widget', 0);
       assert.lengthOf(el.find('li'), 1);
       assert.lengthOf(_scope.widgets, 1);
       assert.equal(eventCount, 1);

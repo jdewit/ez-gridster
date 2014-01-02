@@ -33,12 +33,15 @@
     .box-content {
       padding: 10px;
     }
-    .box-header a {
-      color: #ccc;
-      margin-top: 10px;
+    .box-header-btns {
+      margin-top: 15px;
+      cursor: pointer;
     }
     a {
-      cursor: pointer;
+      color: #ccc;
+    }
+    form {
+      margin-bottom: 0;
     }
   </style>
 
@@ -48,18 +51,20 @@
 
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
 
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.7.0/ui-bootstrap.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.6.0/ui-bootstrap-tpls.min.js"></script>
+
   <script src="src/ez-gridster.js"></script>
   <script src="dist/ez-gridster-tpl.js"></script>
 
   <script>
-      angular.module('myApp', ['ez.gridster'])
+      angular.module('myApp', ['ez.gridster', 'ui.bootstrap'])
 
-      .controller('AppCtrl', ['$scope', function AppCtrl($scope){
+      .controller('AppCtrl', ['$scope', function($scope) {
 
         $scope.options = {
-          widget_base_dimensions: [400, 300],
+          widget_base_dimensions: [400, 300]
         };
-
 
         $scope.dashboards = {
           '1': {
@@ -138,6 +143,33 @@
         $scope.selectedDashboardId = '1';
       }])
 
+      .controller('CustomWidgetCtrl', ['$scope', '$modal', function($scope, $modal){
+        $scope.openSettings = function(widget, index) {
+          $modal.open({
+            scope: $scope,
+            templateUrl: 'widget_settings.html',
+            controller: 'WidgetSettingsCtrl',
+            resolve: {
+              widget: function() {
+                return widget;
+              },
+              index: function() {
+                return index;
+              }
+            }
+          });
+        };
+      }])
+
+      .controller('WidgetSettingsCtrl', ['$scope', '$rootScope', '$modalInstance', 'widget', 'index', function($scope, $rootScope, $modalInstance, widget, index){
+        $scope.widget = widget;
+
+        $scope.remove = function() {
+          $scope.removeWidget(index); // call parent scope method
+          $modalInstance.close();
+        };
+      }])
+
       // helper code
       .filter('object2Array', function() {
         return function(input) {
@@ -153,6 +185,7 @@
   </script>
 </head>
 <body ng-app="myApp">
+
   <div ng-controller="AppCtrl">
     <div class="page-header">
       <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
@@ -164,6 +197,41 @@
     </div>
     <div ez-gridster="widgets" ez-gridster-options="options"></div>
   </div>
+
+  <script id="ez-gridster-tpl.html" type="text/ng-template">
+    <div ng-controller="CustomWidgetCtrl">
+      <div class="box-header">
+        <h3>{{ widget.name }}</h3>
+        <div class="box-header-btns pull-right">
+          <a title="settings" ng-click="openSettings(widget, $index)"><i class="icon-cog"></i></a>
+          <a title="Remove widget" ng-click="removeWidget($index)"><i class="icon-remove"></i></a>
+        </div>
+      </div>
+      <div class="box-content">
+        Custom template
+        {{ widget.name }}
+      </div>
+    </div>
+  </script>
+
+  <script id="widget_settings.html" type="text/ng-template">
+    <form name="widget_form" class="form-horizontal" ng-submit="submit()">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="dismiss()" aria-hidden="true">&times;</button>
+        <h3>Widget Settings</h3>
+      </div>
+
+      <div class="modal-body no-padding">
+        Edit settings for {{ widget.name }} here.
+      </div>
+
+      <div class="modal-footer">
+        <a ng-click="remove()" class="btn btn-danger pull-left" tabindex="-1"><i class="icon-trash"></i>Delete</a>
+        <a ng-click="dismiss()" class="btn" tabindex="-1"><i class="icon-arrow-left"></i>Cancel</a>
+      </div>
+    </form>
+  </script>
+
 </body>
 
 </html>
