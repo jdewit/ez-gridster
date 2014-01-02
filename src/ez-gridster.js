@@ -75,8 +75,9 @@ angular.module('ez.gridster', [])
 
       scope.removeWidget = function(index) {
         scope.gridster.remove_widget($element.find('li.gs-w').eq(index), scope.options.remove.silent, function() {
-          var widget = scope.widgets.splice(index, 1);
-          scope.$emit('ez_gridster.widget_removed', widget);
+          var widget = scope.widgets[index];
+          scope.widgets.splice(index, 1);
+          scope.$emit('ez_gridster.widget_removed', widget, index);
           scope.$digest();
         });
       };

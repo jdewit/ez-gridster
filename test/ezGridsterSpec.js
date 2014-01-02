@@ -81,8 +81,10 @@ describe('ez-gridster', function() {
     _timeout.flush();
     var eventCount = 0;
 
-    _scope.$on('ez_gridster.widget_removed', function() {
+    _scope.$on('ez_gridster.widget_removed', function(e, widget, index) {
       eventCount++;
+      assert.equal(widget.name, 'FOO');
+      assert.equal(index, 0);
     });
 
     setTimeout(function() { // need to wait for gridster to use callback
