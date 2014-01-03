@@ -21,9 +21,7 @@ angular.module('ez.gridster', [])
     restrict: 'AE',
     templateUrl: 'ez-gridster-tpl.html',
     link: function(scope, $element) {
-      $timeout(function() { // add widget to gridster after digest
-        scope.$parent.gridster.add_widget($element);
-      });
+      scope.$parent.gridster.add_widget($element, scope.widget.size_x, scope.widget.size_y, scope.widget.col, scope.widget.row);
     }
   };
 }])
