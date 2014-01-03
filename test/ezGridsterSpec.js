@@ -119,4 +119,62 @@ describe('ez-gridster', function() {
     _scope.$digest();
     assert.lengthOf(el.find('li'), 2);
   });
+
+  it('should call updateWidgets method and emit "ez_gridster.widget_dragged" event draggable stop', function() {
+    var updateWidgetsCount = 0,
+        widgetDraggedEventCount = 0
+    ;
+
+    el.isolateScope().updateWidgets = function() {
+      updateWidgetsCount++;
+    };
+
+    _scope.$on('ez_gridster.widget_dragged', function() {
+      widgetDraggedEventCount++;
+    });
+
+    el.isolateScope().options.draggable.stop();
+    assert.equal(updateWidgetsCount, 1);
+    assert.equal(widgetDraggedEventCount, 1);
+  });
+
+  it('should call updateWidgets method and emit "ez_gridster.widget_resized" event resize stop', function() {
+    var updateWidgetsCount = 0,
+        widgetResizedEventCount = 0
+    ;
+
+    el.isolateScope().updateWidgets = function() {
+      updateWidgetsCount++;
+    };
+
+    _scope.$on('ez_gridster.widget_resized', function() {
+      widgetResizedEventCount++;
+    });
+
+    el.isolateScope().options.resize.stop();
+    assert.equal(updateWidgetsCount, 1);
+    assert.equal(widgetResizedEventCount, 1);
+  });
+
+  it('should update widgets', function() {
+    _timeout.flush();
+    assert.lengthOf(el.find('.gs-w'), 2);
+
+    var $widget = el.find('.gs-w').eq(0);
+    $widget.attr('data-row', '3');
+    $widget.attr('data-col', '3');
+    $widget.attr('data-sizex', '2');
+    $widget.attr('data-sizey', '4');
+
+    var e = {
+      target: el.find('li').eq(0).html()
+    };
+    el.isolateScope().updateWidgets(e);
+
+    assert.equal(_scope.widgets[0].row, 3);
+    assert.equal(_scope.widgets[0].col, 3);
+    assert.equal(_scope.widgets[0].size_x, 2);
+    assert.equal(_scope.widgets[0].size_y, 4);
+  });
+
 });

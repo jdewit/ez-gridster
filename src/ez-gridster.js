@@ -38,12 +38,37 @@ angular.module('ez.gridster', [])
     link: function (scope, $element, attrs) {
       scope.options = angular.extend(ezGridsterConfig, scope.$parent.$eval(attrs.ezGridsterOptions));
 
-      scope.options.draggable.stop = function(e, ui, $widget) {
-        scope.$emit('ez_gridster.widget_dragged', e, ui, $widget);
+      scope.updateWidgets = function(e) { //  update each widgets new position info
+        var $widgets,
+            $widget,
+            widget;
+
+        angular.forEach($element.find('.gs-w'), function(v, k) {
+          $widget = angular.element(v);
+          widget = angular.extend(scope.widgets[k], {
+            size_x: $widget.attr('data-sizex'),
+            size_y: $widget.attr('data-sizey'),
+            col: $widget.attr('data-col'),
+            row: $widget.attr('data-row')
+          });
+
+          scope.widgets[k] = widget;
+        });
+
+        scope.$digest();
+        scope.$emit('ez_gridster.widgets_updated');
       };
 
-      scope.options.resize.stop = function(e, ui, $widget) {
-        scope.$emit('ez_gridster.widget_resized', e, ui, $widget);
+      scope.options.draggable.stop = function(e) {
+        scope.updateWidgets(e);
+
+        scope.$emit('ez_gridster.widget_dragged');
+      };
+
+      scope.options.resize.stop = function(e, ui) {
+        scope.updateWidgets(e);
+
+        scope.$emit('ez_gridster.widget_resized');
       };
 
       scope.gridster = $element.addClass('gridster').find('ul').gridster(scope.options).data('gridster');
