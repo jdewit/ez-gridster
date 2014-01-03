@@ -39,24 +39,14 @@ angular.module('ez.gridster', [])
       scope.options = angular.extend(ezGridsterConfig, scope.$parent.$eval(attrs.ezGridsterOptions));
 
       scope.updateWidgets = function(e) { //  update each widgets new position info
-        var $widgets,
-            $widget,
-            widget;
+        var data = scope.gridster.serialize();
 
-        angular.forEach($element.find('.gs-w'), function(v, k) {
-          $widget = angular.element(v);
-          widget = angular.extend(scope.widgets[k], {
-            size_x: $widget.attr('data-sizex'),
-            size_y: $widget.attr('data-sizey'),
-            col: $widget.attr('data-col'),
-            row: $widget.attr('data-row')
-          });
-
-          scope.widgets[k] = widget;
+        angular.forEach(data, function(v, i) {
+          scope.widgets[i] = angular.extend(scope.widgets[i], v);
         });
 
         scope.$digest();
-        scope.$emit('ez_gridster.widgets_updated');
+        scope.$emit('ez_gridster.widgets_updated', data);
       };
 
       scope.options.draggable.stop = function(e) {

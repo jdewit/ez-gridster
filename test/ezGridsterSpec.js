@@ -156,25 +156,48 @@ describe('ez-gridster', function() {
     assert.equal(widgetResizedEventCount, 1);
   });
 
-  it('should update widgets', function() {
+  it('should update widgets and emit "ez_gridster.widgets_updated" event', function() {
+    var widgetsUpdatedCount = 0;
+
+    var serializeData = [
+      {
+        col : 3,
+        row: 3,
+        size_x: 2,
+        size_y: 4
+      },
+      {
+        col : 2,
+        row: 1,
+        size_x: 1,
+        size_y: 1
+      }
+    ];
+
     _timeout.flush();
     assert.lengthOf(el.find('.gs-w'), 2);
 
-    var $widget = el.find('.gs-w').eq(0);
-    $widget.attr('data-row', '3');
-    $widget.attr('data-col', '3');
-    $widget.attr('data-sizex', '2');
-    $widget.attr('data-sizey', '4');
+    _rootScope.$on('ez_gridster.widgets_updated', function(e, data) {
+      widgetsUpdatedCount++;
+      assert.deepEqual(data, serializeData, 'event should provide serialized data');
+    });
 
     var e = {
       target: el.find('li').eq(0).html()
     };
+
+    el.isolateScope().gridster.serialize = function() { // mock serialize response
+      return serializeData;
+    };
+
     el.isolateScope().updateWidgets(e);
 
     assert.equal(_scope.widgets[0].row, 3);
     assert.equal(_scope.widgets[0].col, 3);
     assert.equal(_scope.widgets[0].size_x, 2);
     assert.equal(_scope.widgets[0].size_y, 4);
+
+    assert.equal(widgetsUpdatedCount, 1);
   });
 
 });
