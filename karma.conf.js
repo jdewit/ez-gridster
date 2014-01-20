@@ -4,6 +4,8 @@ module.exports = function(config) {
 
     frameworks: ['mocha', 'chai'],
 
+    reporters: ['progress', 'coverage'],
+
     files: [
       // libraries
       'bower_components/jquery/jquery.js',
@@ -20,7 +22,18 @@ module.exports = function(config) {
       'test/*Spec.js',
     ],
 
-    autoWatch: true,
+    preprocessors: {
+      'src/ez-gridster.js': ['coverage']
+    },
+
+    // optionally, configure the reporter
+    coverageReporter: {
+      type : 'html',
+      dir : 'test/coverage/'
+    },
+
+    port: 1943,
+
     browsers: ['Chrome']
   });
 };

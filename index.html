@@ -60,7 +60,7 @@
   <script>
       angular.module('myApp', ['ez.gridster', 'ui.bootstrap'])
 
-      .controller('AppCtrl', ['$scope', function($scope) {
+      .controller('AppCtrl', ['$scope', 'GridsterService', function($scope, GridsterService) {
 
         $scope.options = {
           widget_base_dimensions: [400, 300]
@@ -112,20 +112,21 @@
         $scope.widgets = [];
 
         $scope.addWidget = function() {
-          $scope.$broadcast('ez_gridster.add_widget', {name: "New Widget"});
+          var pos = GridsterService.getNextPositions(1, 1);
+
+          var widget = {
+            name: "New Widget",
+            size_x: 1,
+            size_y: 1,
+            row: pos.row,
+            col: pos.col
+          };
+          GridsterService.addWidget(widget);
         };
 
         $scope.clear = function() {
-          $scope.$broadcast('ez_gridster.clear');
+          GridsterService.clear();
         };
-
-        $scope.$on('ez_gridster.widget_added', function(e, widget) {
-          console.log('save the widget to your db', widget);
-        });
-
-        $scope.$on('ez_gridster.widget_removed', function(e, widget, index) {
-          console.log('remove widget in db', widget);
-        });
 
         $scope.$on('ez_gridster.widget_dragged', function() {
           alert('dragged');
@@ -136,20 +137,23 @@
         });
 
         $scope.$watch('selectedDashboardId', function(newVal, oldVal) {
-          $scope.$broadcast('ez_gridster.set', $scope.dashboards[newVal].widgets);
+          GridsterService.setWidgets($scope.dashboards[newVal].widgets);
         });
 
         // init dashboard
         $scope.selectedDashboardId = '1';
       }])
 
-      .controller('CustomWidgetCtrl', ['$scope', '$modal', function($scope, $modal){
-        $scope.openSettings = function(widget, index) {
+      .controller('CustomWidgetCtrl', ['$scope', '$modal', 'GridsterService', function($scope, $modal, GridsterService){
+        $scope.openSettings = function(e, widget, index) {
           $modal.open({
             scope: $scope,
             templateUrl: 'widget_settings.html',
             controller: 'WidgetSettingsCtrl',
             resolve: {
+              $widget: function() {
+                return $(e.currentTarget).parents('.gs-w');
+              },
               widget: function() {
                 return widget;
               },
@@ -159,15 +163,21 @@
             }
           });
         };
+
+        $scope.removeWidget = function(e, widget, index) {
+          GridsterService.removeWidget($(e.currentTarget).parents('.gs-w'), index);
+        };
+
       }])
 
-      .controller('WidgetSettingsCtrl', ['$scope', '$rootScope', '$modalInstance', 'widget', 'index', function($scope, $rootScope, $modalInstance, widget, index){
+      .controller('WidgetSettingsCtrl', ['$scope', '$rootScope', '$modalInstance', 'GridsterService', '$widget', 'widget', 'index', function($scope, $rootScope, $modalInstance, GridsterService, $widget, widget, index){
         $scope.widget = widget;
 
         $scope.remove = function() {
-          $scope.removeWidget(index); // call parent scope method
+          GridsterService.removeWidget($widget, index); 
           $modalInstance.close();
         };
+
       }])
 
       // helper code
@@ -195,7 +205,7 @@
         </select>
       </h1>
     </div>
-    <div ez-gridster="widgets" ez-gridster-options="options"></div>
+    <div ez-gridster ez-gridster-options="options"></div>
   </div>
 
   <script id="ez-gridster-tpl.html" type="text/ng-template">
@@ -203,8 +213,8 @@
       <div class="box-header">
         <h3>{{ widget.name }}</h3>
         <div class="box-header-btns pull-right">
-          <a title="settings" ng-click="openSettings(widget, $index)"><i class="icon-cog"></i></a>
-          <a title="Remove widget" ng-click="removeWidget($index)"><i class="icon-remove"></i></a>
+          <a title="settings" ng-click="openSettings($event, widget, $index)"><i class="icon-cog"></i></a>
+          <a title="Remove widget" ng-click="removeWidget($event, widget, $index)"><i class="icon-remove"></i></a>
         </div>
       </div>
       <div class="box-content">

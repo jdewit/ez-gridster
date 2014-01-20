@@ -42,8 +42,19 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          src: ['src/**/*.js', 'test/**/*.js']
+          src: ['src/**/*.js', 'test/*.js']
         },
+      }
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js',
+        background: false
+      },
+      singleRun: {
+        configFile: 'karma.conf.js',
+        background: false,
+        singleRun: true
       }
     },
     less: {
@@ -54,6 +65,11 @@ module.exports = function(grunt) {
         files: {
           "dist/ez-gridster.min.css": "src/less/ez-gridster.less"
         }
+      }
+    },
+    shell: {
+      clearCoverage: {
+        command: 'rm -rf test/coverage/*'
       }
     },
     ngtemplates:  {
@@ -78,9 +94,9 @@ module.exports = function(grunt) {
       }
     },
     watch: {
-      dev: {
-        files: ['src/**/*'],
-        tasks: ['default'],
+      all: {
+        files: ['Gruntfile.js', 'src/**/*', 'test/*Spec.js'],
+        tasks: ['default', 'karma:unit:run'],
         options: {
           livereload: 9090,
         }
@@ -93,7 +109,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-angular-templates');
 
-  grunt.registerTask('default', ['jshint', 'ngtemplates', 'uglify', 'less']);
+  grunt.registerTask('default', ['jshint', 'ngtemplates', 'uglify']);
+  grunt.registerTask('dev', ['shell:clearCoverage', 'karma:unit:start', 'watch']);
+  grunt.registerTask('test', ['karma:unit:singleRun']);
 };
