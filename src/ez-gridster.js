@@ -42,7 +42,7 @@ angular.module('ez.gridster', [])
     self.gridster.remove_all_widgets();
   };
 
-  this.getNextPositions = function(x, y) {
+  this.getNextPosition = function(x, y) {
     return self.gridster.next_position(x, y);
   };
 

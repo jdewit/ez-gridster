@@ -48,7 +48,7 @@ describe('ez-gridster', function() {
   });
 
   it('should add widget to scope & gridster on "ez_gridster.add_widget" event', function() {
-    var pos = _GridsterService.getNextPositions(1, 1);
+    var pos = _GridsterService.getNextPosition(1, 1);
 
     var widget = {name: 'Test new widget', size_x: 1, size_y: 1};
 

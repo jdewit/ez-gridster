@@ -29,37 +29,6 @@ describe('GridsterService', function() {
         this.serialize_called++;
       }
     };
-
-    //template = $templateCache.get('src/ez-gridster-tpl.html');
-    //$templateCache.put('ez-gridster.html', template);
-    //_timeout = $timeout;
-
-    //_scope = $rootScope.$new();
-    //_rootScope = $rootScope;
-
-    //el = angular.element('<div class="gridster" ez-gridster="widgets" ez-gridster-options="{resize: {enabled: false}}"></div>');
-
-    //widgets = [
-      //{
-        //col : 1,
-        //row: 1,
-        //sizey: 1,
-        //sizex: 1,
-        //name: "FOO"
-      //},
-      //{
-        //col : 2,
-        //row: 1,
-        //sizey: 1,
-        //sizex: 1,
-        //name: "Bar"
-      //}
-    //];
-
-    //_scope.widgets = widgets;
-
-    //$compile(el)(_scope);
-    //_scope.$digest();
   }));
 
   it('should init gridster', function() {
@@ -77,7 +46,7 @@ describe('GridsterService', function() {
 
   it('should get next position', function() {
     _GridsterService.init(gridster);
-    _GridsterService.getNextPositions(1, 1);
+    _GridsterService.getNextPosition(1, 1);
     assert.equal(gridster.next_position_called, 1);
   });
 
