@@ -79,12 +79,9 @@ angular.module('ez.gridster', [])
   return {
     restrict: 'AE',
     replace: true,
-    scope: {
-      config: '=config'
-    },
     template: '<div><ul><li class="gs-w box" ez-gridster-widget ng-repeat="widget in widgets" data-col="{{ widget.col }}" data-row="{{ widget.row }}" data-sizex="{{ widget.size_x }}" data-sizey="{{ widget.size_y }}"></li></ul></div>',
     link: function (scope, $element, attrs) {
-      scope.options = angular.extend(ezGridsterConfig, scope.config);
+      scope.options = angular.extend(ezGridsterConfig, scope.$eval(attrs.config));
 
       scope.updateWidgets = function(e) { //  update each widgets new position info
         var data = GridsterService.serialize();

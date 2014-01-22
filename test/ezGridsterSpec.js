@@ -44,7 +44,7 @@ describe('ez-gridster', function() {
   });
 
   it('should be able to override options', function() {
-    assert.isFalse(el.isolateScope().options.resize.enabled);
+    assert.isFalse(_scope.options.resize.enabled);
   });
 
   it('should add widget to scope & gridster on "ez_gridster.add_widget" event', function() {
@@ -92,7 +92,7 @@ describe('ez-gridster', function() {
     });
 
 
-    el.isolateScope().options.draggable.stop();
+    _scope.options.draggable.stop();
     assert.equal(updateWidgetsCount, 1);
     assert.equal(widgetDraggedCount, 1);
   });
@@ -111,7 +111,7 @@ describe('ez-gridster', function() {
     });
 
 
-    el.isolateScope().options.resize.stop();
+    _scope.options.resize.stop();
     assert.equal(updateWidgetsCount, 1);
     assert.equal(widgetResizedCount, 1);
   });
@@ -150,7 +150,7 @@ describe('ez-gridster', function() {
       return serializeData;
     };
 
-    el.isolateScope().updateWidgets(e);
+    _scope.updateWidgets(e);
 
     assert.equal(_GridsterService.widgets[0].row, 3);
     assert.equal(_GridsterService.widgets[0].col, 3);
