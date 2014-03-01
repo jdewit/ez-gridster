@@ -8,15 +8,13 @@ module.exports = function(config) {
 
     files: [
       // libraries
-      'bower_components/jquery/jquery.js',
-      'bower_components/jquery-ui/ui/jquery-ui.js',
+      'bower_components/jquery/dist/jquery.js',
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/gridster/dist/jquery.gridster.js',
 
       // our app
       'src/ez-gridster.js',
-      'dist/ez-gridster-tpl.js',
 
       // tests
       'test/*Spec.js',
@@ -32,7 +30,7 @@ module.exports = function(config) {
       dir : 'test/coverage/'
     },
 
-    port: 1943,
+    port: 1941,
 
     browsers: ['Chrome']
   });

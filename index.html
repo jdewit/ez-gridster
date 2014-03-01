@@ -2,11 +2,75 @@
 <html>
 
 <head>
-  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
   <link href="//rawgithub.com/ducksboard/gridster.js/master/dist/jquery.gridster.min.css" rel="stylesheet">
 
   <style>
+    .gridster * {
+      margin:0;
+      padding:0;
+    }
+
+    ul {
+      list-style-type: none;
+    }
+
+    body {
+        font-size: 16px;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: #444;
+        margin: 30px 40px;
+    }
+
+    .controls {
+        margin-bottom: 20px;
+    }
+
+    /*/
+    /* gridster
+    /*/
+
+    .gridster ul {
+        border: 1px solid #ccc;
+    }
+
+    .gridster li {
+        font-size: 1em;
+        font-weight: bold;
+        text-align: center;
+        line-height: 100%;
+    }
+
+
+    .gridster {
+        margin: 0 auto;
+
+        opacity: .8;
+
+        -webkit-transition: opacity .6s;
+        -moz-transition: opacity .6s;
+        -o-transition: opacity .6s;
+        -ms-transition: opacity .6s;
+        transition: opacity .6s;
+    }
+
+    .gridster .gs-w {
+        background: #DDD;
+        cursor: pointer;
+    }
+
+    .gridster .player {
+        background: #BBB;
+    }
+
+
+    .gridster .preview-holder {
+        border: none!important;
+        background: red!important;
+    }
+
+    
     body {
       padding: 0 10px;
     }
@@ -45,26 +109,20 @@
     }
   </style>
 
-  <script type="text/javascript" src="//code.jquery.com/jquery-1.9.1.js"></script>
-  <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script type="text/javascript" src="//rawgithub.com/ducksboard/gridster.js/master/dist/jquery.gridster.min.js"></script>
 
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular.min.js"></script>
 
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.7.0/ui-bootstrap.min.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.6.0/ui-bootstrap-tpls.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.min.js"></script>
 
   <script src="src/ez-gridster.js"></script>
-  <script src="dist/ez-gridster-tpl.js"></script>
 
   <script>
       angular.module('myApp', ['ez.gridster', 'ui.bootstrap'])
 
       .controller('AppCtrl', ['$scope', 'GridsterService', function($scope, GridsterService) {
-
-        $scope.options = {
-          widget_base_dimensions: [400, 300]
-        };
 
         $scope.dashboards = {
           '1': {
@@ -72,17 +130,17 @@
             name: 'Home',
             widgets: [
               {
-                col : 1,
-                row: 1,
-                size_y: 1,
-                size_x: 1,
+                col : "1",
+                row: "1",
+                sizey: "1",
+                sizex: "1",
                 name: "Widget 1"
               },
               {
                 col : 3,
-                row: 1,
-                size_y: 1,
-                size_x: 1,
+                row: "1",
+                sizey: "1",
+                sizex: "1",
                 name: "Widget 2"
               }
             ]
@@ -92,56 +150,44 @@
             name: 'Other',
             widgets: [
               {
-                col : 1,
-                row: 1,
-                size_y: 1,
-                size_x: 2,
+                col : "1",
+                row: "1",
+                sizey: "1",
+                sizex: 2,
                 name: "Other Widget 1"
               },
               {
-                col : 1,
+                col : "1",
                 row: 3,
-                size_y: 1,
-                size_x: 1,
+                sizey: "1",
+                sizex: "1",
                 name: "Other Widget 2"
               }
             ]
           }
         };
 
-        $scope.widgets = [];
-
-        $scope.addWidget = function() {
-          var pos = GridsterService.getNextPositions(1, 1);
-
-          var widget = {
-            name: "New Widget",
-            size_x: 1,
-            size_y: 1,
-            row: pos.row,
-            col: pos.col
-          };
-          GridsterService.addWidget(widget);
+        $scope.customOptions = {
+          widget_base_dimensions: [200, 200]
         };
 
         $scope.clear = function() {
           GridsterService.clear();
         };
 
-        $scope.$on('ez_gridster.widget_dragged', function() {
-          alert('dragged');
-        });
-
-        $scope.$on('ez_gridster.widget_resized', function() {
-          alert('resized');
-        });
-
+        $scope.addWidget = function() {
+          GridsterService.addWidget({name: "New Widget", sizex: 1, sizey: 1});
+        };
+     
         $scope.$watch('selectedDashboardId', function(newVal, oldVal) {
-          GridsterService.setWidgets($scope.dashboards[newVal].widgets);
+          if (newVal !== oldVal) {
+            GridsterService.setWidgets($scope.dashboards[newVal].widgets);
+          }
         });
 
         // init dashboard
         $scope.selectedDashboardId = '1';
+        GridsterService.setWidgets($scope.dashboards[1].widgets);
       }])
 
       .controller('CustomWidgetCtrl', ['$scope', '$modal', 'GridsterService', function($scope, $modal, GridsterService){
@@ -164,18 +210,41 @@
           });
         };
 
-        $scope.removeWidget = function(e, widget, index) {
-          GridsterService.removeWidget($(e.currentTarget).parents('.gs-w'), index);
+        $scope.removeWidget = function(e) {
+          GridsterService.removeWidget($(e.currentTarget).parents('.gs-w'));
         };
 
       }])
 
-      .controller('WidgetSettingsCtrl', ['$scope', '$rootScope', '$modalInstance', 'GridsterService', '$widget', 'widget', 'index', function($scope, $rootScope, $modalInstance, GridsterService, $widget, widget, index){
+      .controller('WidgetSettingsCtrl', ['$scope', '$timeout', '$rootScope', '$modalInstance', 'GridsterService', '$widget', 'widget', 'index', function($scope, $timeout, $rootScope, $modalInstance, GridsterService, $widget, widget, index){
         $scope.widget = widget;
 
+        $scope.form = {
+          name: widget.name,
+          sizex: widget.sizex,
+          sizey: widget.sizey,
+          col: widget.col,
+          row: widget.row
+        };
+
+        $scope.sizeOptions = [{id: '1', name: '1'}, {id: '2', name: '2'}, {id: '3', name: '3'}, {id: '4', name: '4'}];
+
+        $scope.dismiss = function() {
+          $modalInstance.dismiss();
+        };
+
         $scope.remove = function() {
-          GridsterService.removeWidget($widget, index); 
+          GridsterService.removeWidget($widget); 
           $modalInstance.close();
+        };
+
+        $scope.submit = function() {
+          widget = $scope.form;
+          GridsterService.removeWidget($widget);
+          $timeout(function() {
+            GridsterService.addWidget(widget);
+          }, 300);
+          $modalInstance.close(widget)
         };
 
       }])
@@ -196,20 +265,8 @@
 </head>
 <body ng-app="myApp">
 
-  <div ng-controller="AppCtrl">
-    <div class="page-header">
-      <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
-      <a class="pull-right btn btn-warning" ng-click="clear()"><i class="icon-trash"></i> Clear</a>
-      <h1>ez-gridster
-        <select ng-change="changeDashboard()" ng-model="selectedDashboardId" ng-options="d.id as d.name for d in dashboards | object2Array | orderBy:'id'">
-        </select>
-      </h1>
-    </div>
-    <div ez-gridster ez-gridster-options="options"></div>
-  </div>
-
-  <script id="ez-gridster-tpl.html" type="text/ng-template">
-    <div ng-controller="CustomWidgetCtrl">
+  <script id="ez-gridster-widget.html" type="text/ng-template">
+    <li ng-controller="CustomWidgetCtrl">
       <div class="box-header">
         <h3>{{ widget.name }}</h3>
         <div class="box-header-btns pull-right">
@@ -221,25 +278,86 @@
         Custom template
         {{ widget.name }}
       </div>
-    </div>
+    </li>
   </script>
 
+
+  <div ng-controller="AppCtrl">
+    <div class="page-header">
+      <a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="icon-plus"></i> Add Widget</a>
+      <a class="pull-right btn btn-warning" ng-click="clear()"><i class="icon-trash"></i> Clear</a>
+      <h1>ez-gridster
+        <select ng-change="changeDashboard()" ng-model="selectedDashboardId" ng-options="d.id as d.name for d in dashboards | object2Array | orderBy:'id'">
+        </select>
+      </h1>
+    </div>
+    <div ez-gridster ez-gridster-config="customOptions"></div>
+  </div>
+
   <script id="widget_settings.html" type="text/ng-template">
-    <form name="widget_form" class="form-horizontal" ng-submit="submit()">
+    <div>
+    <form name="_form" class="form-horizontal" ng-submit="submit(_form)">
       <div class="modal-header">
         <button type="button" class="close" ng-click="dismiss()" aria-hidden="true">&times;</button>
         <h3>Widget Settings</h3>
       </div>
 
       <div class="modal-body no-padding">
-        Edit settings for {{ widget.name }} here.
+          <div class="row">
+            <div class="form-group" ng-class="{error: _form.name.$error && _form.submitted}">
+              <label class="control-label col-lg-3">Name</label>
+              <div class="col-lg-9">
+                <input name="name" type="text" ng-model="form.name" class="form-control"/>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group" ng-class="{error: _form.sizex.$error && _form.submitted}">
+                <label class="control-label col-lg-6">Width</label>
+                <div class="col-lg-6">
+                  <select name="sizex" ng-model="form.sizex" class="form-control" ng-options="option.id as option.name for option in sizeOptions"></select>
+                </div>
+              </div>
+             </div>
+            <div class="col-lg-6">
+              <div class="form-group">
+                <label class="control-label col-lg-6">Height</label>
+                <div class="col-lg-6">
+                  <select name="sizey" ng-model="form.sizey" class="form-control" ng-options="option.id as option.name for option in sizeOptions"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group" ng-class="{error: _form.sizex.$error && _form.submitted}">
+                <label class="control-label col-lg-6">Column</label>
+                <div class="col-lg-6">
+                  <select name="col" ng-model="form.col" class="form-control" ng-options="option.id as option.name for option in sizeOptions"></select>
+                </div>
+              </div>
+             </div>
+            <div class="col-lg-6">
+              <div class="form-group">
+                <label class="control-label col-lg-6">Row</label>
+                <div class="col-lg-6">
+                  <select name="row" ng-model="form.row" class="form-control" ng-options="option.id as option.name for option in sizeOptions"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr>
       </div>
 
       <div class="modal-footer">
         <a ng-click="remove()" class="btn btn-danger pull-left" tabindex="-1"><i class="icon-trash"></i>Delete</a>
-        <a ng-click="dismiss()" class="btn" tabindex="-1"><i class="icon-arrow-left"></i>Cancel</a>
+        <a ng-click="dismiss()" class="btn" tabindex="-1"><i class="icon-remove"></i>Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg"><i class="icon-ok"></i>Save</button>
       </div>
     </form>
+    </div>
   </script>
 
 </body>

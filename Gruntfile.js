@@ -15,40 +15,18 @@ module.exports = function(grunt) {
     },
     jshint: {
       options: {
-        curly: true,
-        eqeqeq: true,
-        eqnull: true,
-        browser: true,
-        globals: {
-          jQuery: true
-        },
+        jshintrc: '.jshintrc'
       },
       src: {
-        options: {
-          node: true,
-          globals: {
-            it: true,
-            beforeEach: true,
-            expect: true,
-            element: true,
-            browser: true,
-            module: true,
-            spyOn: true,
-            inject: true,
-            repeater: true,
-            describe: true,
-            angular: true,
-            jQuery: true
-          }
-        },
         files: {
-          src: ['src/**/*.js', 'test/*.js']
+          src: ['src/*.js']
         },
       }
     },
     karma: {
       unit: {
         configFile: 'karma.conf.js',
+        singleRun: false,
         background: false
       },
       singleRun: {
@@ -57,34 +35,13 @@ module.exports = function(grunt) {
         singleRun: true
       }
     },
-    less: {
-      dist: {
-        options: {
-          yuicompress: true
-        },
-        files: {
-          "dist/ez-gridster.min.css": "src/less/ez-gridster.less"
-        }
-      }
-    },
-    shell: {
-      clearCoverage: {
-        command: 'rm -rf test/coverage/*'
-      }
-    },
-    ngtemplates:  {
-      ezGridster:      {
-        src:      'src/*.html',
-        dest:     'dist/ez-gridster-tpl.js',
-        options: {
-          module: 'ez.gridster',
-          url: function(url) { return url.replace('src/', ''); }
-        }
-      }
+    clean: {
+      clearCoverage: 'test/coverage/*'
     },
     uglify: {
       options: {
-        mangle: false,
+        mangle: true,
+        compile: true,
         compress: true
       },
       dist: {
@@ -95,11 +52,8 @@ module.exports = function(grunt) {
     },
     watch: {
       all: {
-        files: ['Gruntfile.js', 'src/**/*', 'test/*Spec.js'],
-        tasks: ['default', 'karma:unit:run'],
-        options: {
-          livereload: 9090,
-        }
+        files: ['Gruntfile.js', 'src/*', 'test/*'],
+        tasks: ['default', 'karma:unit:run']
       }
     }
   });
@@ -109,11 +63,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-bump');
-  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-angular-templates');
 
-  grunt.registerTask('default', ['jshint', 'ngtemplates', 'uglify']);
-  grunt.registerTask('dev', ['shell:clearCoverage', 'karma:unit:start', 'watch']);
-  grunt.registerTask('test', ['karma:unit:singleRun']);
+  grunt.registerTask('default', ['jshint', 'uglify']);
+  grunt.registerTask('dev', ['clean:clearCoverage', 'karma:unit:start', 'watch:all']);
+  grunt.registerTask('test', ['karma:singleRun']);
 };

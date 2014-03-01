@@ -1,19 +1,20 @@
 describe('ez-gridster', function() {
-  var el, _scope, _rootScope, _timeout, widgets, _GridsterService;
+  var el, $scope, _rootScope, $timeout, widgets, GridsterService, EzGridsterConfig;
 
   beforeEach(module('ez.gridster'));
 
-  beforeEach(inject(function($templateCache, $rootScope, $timeout, $compile, GridsterService) {
+  beforeEach(inject(function($templateCache, _$rootScope_, _$timeout_, $compile, _GridsterService_, _EzGridsterConfig_) {
 
-    template = $templateCache.get('src/ez-gridster-tpl.html');
-    $templateCache.put('ez-gridster.html', template);
-    _timeout = $timeout;
+    template = '<li>{{ widget.name }}</li>';
+    $templateCache.put('ez-gridster-widget.html', template);
 
-    _scope = $rootScope.$new();
-    _rootScope = $rootScope;
-    _GridsterService = GridsterService;
+    $timeout = _$timeout_;
+    $rootScope = _$rootScope_;
+    $scope = $rootScope.$new();
+    GridsterService = _GridsterService_;
+    EzGridsterConfig = _EzGridsterConfig_;
 
-    el = angular.element('<ez-gridster config="{resize: {enabled: false}}"></ez-gridster>');
+    el = angular.element('<div ez-gridster ez-gridster-config="options"></div>');
 
     widgets = [
       {
@@ -32,10 +33,17 @@ describe('ez-gridster', function() {
       }
     ];
 
-    _GridsterService.setWidgets(widgets);
+    $scope.options = {
+      resize: {enabled: false}
+    };
 
-    $compile(el)(_scope);
-    _scope.$digest();
+    $compile(el)($scope);
+    $scope.$digest();
+
+    GridsterService.setWidgets(widgets);
+
+    $scope.$digest();
+    $timeout.flush();
   }));
 
   it('should init gridster widgets', function() {
@@ -44,120 +52,44 @@ describe('ez-gridster', function() {
   });
 
   it('should be able to override options', function() {
-    assert.isFalse(el.isolateScope().options.resize.enabled);
+    assert.isUndefined(el.find('.gs-resize-handle').get(0));
   });
 
-  it('should add widget to scope & gridster on "ez_gridster.add_widget" event', function() {
-    var pos = _GridsterService.getNextPosition(1, 1);
-
+  it('should add widget', function() {
     var widget = {name: 'Test new widget', size_x: 1, size_y: 1};
 
-    widget = angular.extend(widget, pos);
-
-    _GridsterService.addWidget(widget);
-    _scope.$digest();
+    GridsterService.addWidget(widget);
+    $scope.$digest();
 
     assert.lengthOf(el.find('li'), 3);
   });
 
-  it('should remove widget from scope & gridster via removeWidget method', function(done) {
-      _GridsterService.removeWidget(el.find('.gs-w').eq(0), 0, function() {
+  it('should remove widget', function(done) {
+      GridsterService.removeWidget(el.find('.gs-w').eq(0), function() {
         assert.lengthOf(el.find('li'), 1);
-        assert.lengthOf(_GridsterService.widgets, 1);
         done();
       });
   });
 
-  it('should clear gridster on "ez_gridster.clear" event', function(done) {
-    _GridsterService.clear();
-    _scope.$digest();
+  it('should clear gridster', function(done) {
+    GridsterService.clear();
+    $scope.$digest();
 
-    setTimeout(function() { // why is this soooo slow??
+    setTimeout(function() {
       assert.lengthOf(el.find('li'), 0);
       done();
     }, 500);
   });
 
-  it('should call updateWidgets method and emit "ez_gridster.widget_dragged" event draggable stop', function() {
-    var updateWidgetsCount = 0,
-        widgetDraggedCount = 0
-    ;
+  it('should get next position', function() {
+    var pos = GridsterService.nextPosition(1, 1);
+    $scope.$digest();
 
-    _scope.$on('ez_gridster.widget_dragged', function() {
-      widgetDraggedCount++;
-    });
-
-    _scope.$on('ez_gridster.widgets_updated', function() {
-      updateWidgetsCount++;
-    });
-
-
-    el.isolateScope().options.draggable.stop();
-    assert.equal(updateWidgetsCount, 1);
-    assert.equal(widgetDraggedCount, 1);
+    assert.equal(pos.row, 3);
+    assert.equal(pos.col, 1);
   });
 
-  it('should call updateWidgets method and emit "ez_gridster.widget_resized" event resize stop', function() {
-    var updateWidgetsCount = 0,
-        widgetResizedCount = 0
-    ;
-
-    _scope.$on('ez_gridster.widget_resized', function() {
-      widgetResizedCount++;
-    });
-
-    _scope.$on('ez_gridster.widgets_updated', function() {
-      updateWidgetsCount++;
-    });
-
-
-    el.isolateScope().options.resize.stop();
-    assert.equal(updateWidgetsCount, 1);
-    assert.equal(widgetResizedCount, 1);
+  it('should bind widget scope', function() {
+    assert.equal(el.find('li:first-child').text(), 'FOO');
   });
-
-  it('should update widgets and emit "ez_gridster.widgets_updated" event', function() {
-    var widgetsUpdatedCount = 0;
-
-    var serializeData = [
-      {
-        col : 3,
-        row: 3,
-        size_x: 2,
-        size_y: 4
-      },
-      {
-        col : 2,
-        row: 1,
-        size_x: 1,
-        size_y: 1
-      }
-    ];
-
-    _timeout.flush();
-    assert.lengthOf(el.find('.gs-w'), 2);
-
-    _rootScope.$on('ez_gridster.widgets_updated', function(e, data) {
-      widgetsUpdatedCount++;
-      assert.deepEqual(data, serializeData, 'event should provide serialized data');
-    });
-
-    var e = {
-      target: el.find('li').eq(0).html()
-    };
-
-    _GridsterService.serialize = function() { // mock serialize response
-      return serializeData;
-    };
-
-    el.isolateScope().updateWidgets(e);
-
-    assert.equal(_GridsterService.widgets[0].row, 3);
-    assert.equal(_GridsterService.widgets[0].col, 3);
-    assert.equal(_GridsterService.widgets[0].size_x, 2);
-    assert.equal(_GridsterService.widgets[0].size_y, 4);
-
-    assert.equal(widgetsUpdatedCount, 1);
-  });
-
 });
