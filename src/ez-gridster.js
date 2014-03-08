@@ -45,6 +45,7 @@ angular.module('ez.gridster', [])
         var widgetScope = scope.$new();
 
         widgetScope.widget = widget;
+        widgetScope.gridster = gridster;
 
         return $compile(angular.element(this.widgetTemplate).get(0))(widgetScope);
       };
