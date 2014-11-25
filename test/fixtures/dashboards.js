@@ -4,7 +4,7 @@ var DASHBOARDS = [{
 	name: 'Home',
 	widgets: [{
 		name: 'Widget 1',
-		src: 'demo/dashboard/images/chart1.png',
+		src: 'demo/images/chart1.png',
 		desktop: {
 			// gridster should resolve this
 		},
@@ -19,7 +19,7 @@ var DASHBOARDS = [{
 		}
 	}, {
 		name: 'Widget 2',
-		src: 'demo/dashboard/images/chart2.png',
+		src: 'demo/images/chart2.png',
 		desktop: {
 			col: 9,
 			row: 0,
@@ -34,7 +34,7 @@ var DASHBOARDS = [{
 		}
 	}, {
 		name: 'Widget 3',
-		src: 'demo/dashboard/images/chart3.png',
+		src: 'demo/images/chart3.png',
 		desktop: {
 			sizeX: 4,
 			sizeY: 4
@@ -80,7 +80,7 @@ var DASHBOARDS = [{
 			sizeX: 6,
 			sizeY: 4
 		},
-		src: 'demo/dashboard/images/chart3.png',
+		src: 'demo/images/chart3.png',
 		name: 'Other Widget 1'
 	}, {
 		desktop: {
@@ -95,7 +95,7 @@ var DASHBOARDS = [{
 			sizeX: 4,
 			sizeY: 3
 		},
-		src: 'demo/dashboard/images/chart1.png',
+		src: 'demo/images/chart1.png',
 		name: 'Other Widget 2'
 	}]
 }];

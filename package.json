@@ -1,12 +1,10 @@
 {
-  "name": "angular-gridster",
-  "version": "0.9.8",
-  "description": "This directive gives you gridster behavior",
+  "name": "ez-gridster",
+  "version": "0.0.1",
   "license": "MIT",
-  "homepage": "http://manifestwebdesign.github.io/angular-gridster",
-  "authors": "https://github.com/ManifestWebDesign/angular-gridster/graphs/contributors",
   "devDependencies": {
     "grunt": "^0.4.5",
+    "grunt-angular-templates": "^0.5.7",
     "grunt-bump": "0.0.14",
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-connect": "^0.7.1",
@@ -27,8 +25,7 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-script-launcher": "^0.1.0",
     "matchdep": "^0.3.0",
-    "mocha": "^1.19.0",
-    "grunt-ngmin": "0.0.3"
+    "mocha": "^1.19.0"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -38,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:ManifestWebDesign/angular-gridster.git"
+    "url": "git@github.com:jdewit/ez-gridster.git"
   },
-  "main": "dist/angular-gridster.min.js"
+  "main": "dist/ez-gridster.min.js"
 }

@@ -1,4 +1,4 @@
-angular.module('app')
+angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 
 .controller('DashboardCtrl', ['$scope', '$timeout',
 	function($scope, $timeout) {
@@ -80,7 +80,7 @@ angular.module('app')
 			alert('click');
 			$modal.open({
 				scope: $scope,
-				templateUrl: 'demo/dashboard/widget_settings.html',
+				templateUrl: 'demo/views/widget_settings.html',
 				controller: 'WidgetSettingsCtrl',
 				resolve: {
 					widget: function() {

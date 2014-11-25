@@ -10,7 +10,7 @@ app.directive('gridster', function($window, $timeout) {
 			config: '=?gridster',
 			api: '=?'
 		},
-		template: '<div class="gridster"><div ng-repeat="item in items track by item[options.trackByProperty]" gridster-item="item" gridster-options="options" class="gridster-item"><div class="gridster-item-content" inject></div><div class="resize-s-handle"></div><div class="resize-e-handle"></div><div class="gridster-item-overlay"></div></div><div class="gridster-preview-holder"></div></div>',
+		templateUrl: 'ez-gridster-tpl.html',
 		replace: true,
 		transclude: true,
 		link: function(scope, $element, attrs, controller) {

@@ -1,5 +1,5 @@
 /*jshint -W079 */
-var app = angular.module('gridster', []);
+var app = angular.module('ez.gridster', []);
 
 /**
  * @name gridsterConfig

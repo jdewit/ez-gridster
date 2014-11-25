@@ -32,8 +32,8 @@ module.exports = function(grunt) {
 			},
 			main: {
 				files: {
-					'dist/css/angular-gridster.min.css': ['dist/css/angular-gridster.css'],
-					'dist/css/angular-gridster-resizable.min.css': ['dist/css/angular-gridster-resizable.css']
+					'dist/ez-gridster.min.css': ['dist/ez-gridster.css'],
+					'dist/ez-gridster-resizable.min.css': ['dist/ez-gridster-resizable.css']
 				}
 			}
 		},
@@ -46,8 +46,8 @@ module.exports = function(grunt) {
 				footer: '}(angular));',
 			},
 			main: {
-				src: ['src/js/*/*'],
-				dest: 'dist/js/<%= pkg.name %>.js'
+				src: ['src/js/**/*.js'],
+				dest: 'dist/<%= pkg.name %>.js'
 			}
 		},
 		connect: {
@@ -73,7 +73,7 @@ module.exports = function(grunt) {
 				src: ['demo/**/*.{html, js}', 'src/**/*.js', 'test/**/*.js', 'Gruntfile.js', 'karma.conf.js', 'bower.json', 'index.html', 'ptor.conf.js']
 			},
 			dist: {
-				src: ['dist/js/angular-gridster.js']
+				src: ['dist/ez-gridster.js']
 			}
 		},
 		jshint: {
@@ -96,22 +96,35 @@ module.exports = function(grunt) {
 			}
 		},
 		less: {
-			main: {
+			dev: {
 				files: {
-					'dist/css/angular-gridster.css': 'src/less/angular-gridster.less'
+					'dist/ez-gridster.css': 'src/less/ez-gridster.less'
 				}
 			},
-			resizable: {
+			demo: {
 				files: {
-					'dist/css/angular-gridster-resizable.css': ['src/less/angular-gridster.less', 'src/less/angular-gridster-resizable.less']
+					'demo/css/style.css': ['demo/less/*']
 				}
 			}
 		},
-		ngmin: {
-			main: {
-				src: ['dist/js/angular-gridster.js'],
-				dest: 'dist/js/angular-gridster.js'
+		ngtemplates: {
+		  ezList: {
+			src:      'src/templates/*.html',
+			dest:     'dist/ez-gridster-tpl.min.js',
+			options: {
+			  module: 'ez.gridster',
+			  url: function(url) { return url.replace('src/templates/', ''); },
+			  htmlmin: {
+				collapseBooleanAttributes:      true,
+				collapseWhitespace:             true,
+				removeComments:                 true,
+				removeEmptyAttributes:          true,
+				removeRedundantAttributes:      true,
+				removeScriptTypeAttributes:     true,
+				removeStyleLinkTypeAttributes:  true
+			  }
 			}
+		  }
 		},
 		protractor: {
 			e2e: {
@@ -127,14 +140,14 @@ module.exports = function(grunt) {
 				options: {
 					banner: banner,
 				},
-				src: ['dist/js/angular-gridster.js'],
-				dest: 'dist/js/angular-gridster.min.js'
+				src: ['dist/ez-gridster.js'],
+				dest: 'dist/ez-gridster.min.js'
 			}
 		},
 		watch: {
 			dev: {
 				files: ['Gruntfile.js', 'karma.conf.js', 'ptor.conf.js', 'src/**/*', 'test/*/*.js'],
-				tasks: ['jshint', 'concat', 'ngmin', 'jsbeautifier:dist', 'uglify', 'less', 'cssmin', 'karma:unit:run'],
+				tasks: ['jshint', 'concat', 'jsbeautifier:dist', 'uglify', 'less', 'cssmin'],
 				options: {
 					reload: true,
 					livereload: true,
@@ -148,9 +161,9 @@ module.exports = function(grunt) {
 		}
 	});
 
-	grunt.registerTask('default', ['jsbeautifier:dev', 'jshint', 'concat', 'ngmin', 'jsbeautifier:dist', 'uglify', 'less', 'cssmin']);
+	grunt.registerTask('default', ['jshint', 'concat', 'ngtemplates', 'uglify', 'less', 'cssmin']);
 
-	grunt.registerTask('dev', ['karma:unit:start', 'watch:dev']);
+	grunt.registerTask('dev', ['watch:dev']);
 
 	grunt.registerTask('dev_e2e', ['watch:e2e', 'protractor']);
 
