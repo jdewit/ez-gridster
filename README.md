@@ -1,19 +1,19 @@
-angular-gridster
-================
-[![Build Status](https://travis-ci.org/ManifestWebDesign/angular-gridster.svg)](https://travis-ci.org/ManifestWebDesign/angular-gridster)
+ez-gridster
+===========
 
-An implementation of gridster-like widgets for Angular JS.  This is not a wrapper on the original gridster jQuery plugin (http://gridster.net/).  It is instead completely rewritten as Angular directives.  Rewriting allowed for some additional features and better use of Angular data binding.  Even more importantly, the original plugin had unpredictable behavior and crashed when wrapped with an Angular directive in my initial tests.
+This is a fork of the excellent <a href="https://github.com/ManifestWebDesign/angular-gridster">Manifest Web Designs angular-gridster directive</a>. I needed some features that required breaking some backwards compatibility. 
+
 
 ##Demo
 
-See <a href="https://cdn.rawgit.com/ManifestWebDesign/angular-gridster/master/index.html">Live Demo</a>
+See <a href="https://cdn.rawgit.com/jdewit/ez-gridster/demo.html">Live Demo</a>
 
 ##Usage
 
 ##Installation
 
 ```bash
-  bower install angular-gridster
+  bower install ez-gridster
 ```
 
 Then, import the following in your HTML alongside `jQuery` and `angular`:
@@ -22,94 +22,31 @@ Then, import the following in your HTML alongside `jQuery` and `angular`:
   <script src="src/angular-gridster.js"></script>
 ```
 
-##Configuration
-```js
-	/**
-	 * The width of the grid.
-	 * @type {string|number}
-	 */
-	width: 'auto',
+##usage 
 
-	/**
-	 * The width of the columns.
-	 * "auto" will divide the width of the grid evenly among the columns
-	 * @type {string|number}
-	 */
-	colWidth: 'auto',
-
-	/**
-	 * The height of the rows.
-	 * "match" will set the row height to be the same as the column width
-	 * @type {string|number}
-	 */
-	rowHeight: 'match',
-
-	/**
-	 * Row/column
-	 * @type {array}
-	 */
-	margins: [10, 10],
-
-	/**
-	 * The minimum width a column can be, will cause switch to lower view mode
-	 * @type {number}
-	 */
-	minColWidth: null,
-
-	/**
-	 * The minimum amount of rows to show if the grid is empty
-	 * @type {number}
-	 */
-	minRows: 3,
-
-	/**
-	 * The maximum amount of rows allowed in the grid
-	 * @type {number}
-	 */
-	maxRows: 100,
-
-	/**
-	 * The default width of a item
-	 * @type {number}
-	 */
-	defaultSizeX: 1,
-
-	/**
-	 * The default height of a item
-	 * @type {number}
-	 */
-	defaultSizeY: 1,
-
-	/**
-	 * The items id field name
-	 * @type {string}
-	 */
-	trackByField: 'id',
-
-	/**
-	 * Float items up on changes if true
-	 * @type {boolean}
-	 */
-	floatItemsUp: true,
-
-	/**
-	 * Move overlapping items if true
-	 * @type {string}
-	 */
-	moveOverlappingItems: true,
-
-	/**
-	 * Allow items to be resized if true
-	 * @type {boolean}
-	 */
-	resizableEnabled: true,
-
-	/**
-	 * Apply overlays to grid items on drag/resize.
-	 * Useful for preventing mouse hijacking with iframes.
-	 */
-	overlaysEnabled: false
+In your view
+```html
+<div gridster="items"></div>
 ```
+
+In your controller:
+```js
+    $scope.items = [
+		{
+			name: 'Item 1',
+			col: 1,
+			row: 1,
+			sizeX: 3,
+			sizeY: 4
+		}
+	];
+```
+
+
+
+##Configuration
+
+See <a href="src/js/constants/gridsterConfig.js">gridsterConfig</a> constant.
 
 ##Contributing
 
