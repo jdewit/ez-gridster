@@ -117,7 +117,7 @@
   margin: 20px 0;
 }
 .gridster.gridster-loaded .gridster-item.gridster-item-moving {
-  z-index: 4;
+  z-index: 999999999 !important;
   -webkit-transition: none !important;
   -moz-transition: none !important;
   -o-transition: none !important;
