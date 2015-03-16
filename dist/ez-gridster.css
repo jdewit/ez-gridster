@@ -3,7 +3,7 @@
   margin: 0 auto;
   height: 0;
 }
-.gridster.loaded {
+.gridster.gridster-loaded {
   -webkit-transition: height .5s;
   -moz-transition: height .5s;
   transition: height .5s;

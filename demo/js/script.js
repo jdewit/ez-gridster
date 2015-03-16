@@ -41,6 +41,10 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 			$scope.dashboard.widgets.push(newItem);
 		};
 
+		$scope.$on('remove_widget', function(e, widget) {
+			$scope.dashboard.widgets.splice($scope.dashboard.widgets.indexOf(widget), 1);
+		});
+
 		$scope.dashboard = $scope.dashboards[0];
 	}
 ])
@@ -49,7 +53,7 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 	function($scope, $modal, $timeout, $sce) {
 
 		$scope.remove = function() {
-			$scope.dashboard.widgets.splice($scope.dashboard.widgets.indexOf(scope.item), 1);
+			$scope.$emit('remove_widget', $scope.item);
 		};
 
 		if ($scope.item.src) {

@@ -53,6 +53,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	 */
 	this.setLoaded = function() {
 		$scope.options.isLoaded = true;
+		this.addClass('gridster-loaded');
 		$scope.$broadcast('ez-gridster.loaded');
 	};
 
@@ -155,9 +156,9 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		}
 
 		if (this.getOption('previewEnabled')) {
-			$gridElement.addClass('gridster-preview-enabled');
+			this.addClass('gridster-preview-enabled');
 		} else {
-			$gridElement.removeClass('gridster-preview-enabled');
+			this.removeClass('gridster-preview-enabled');
 		}
 
 		if (this.getOption('width') !== 'auto') {

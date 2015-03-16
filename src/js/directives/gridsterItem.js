@@ -313,6 +313,8 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 					dragInteract = null;
 				}
 
+				gridster.floatItemsUp();
+
 				gridster.updateGridHeight();
 			});
 
