@@ -1,7 +1,7 @@
 /**
  * @name gridsterDirective
  */
-app.directive('gridster', function($window, $timeout) {
+app.directive('gridster', ['$window', '$timeout', function($window, $timeout) {
 	return {
 		restrict: 'EA',
 		controller: 'GridsterCtrl',
@@ -18,6 +18,9 @@ app.directive('gridster', function($window, $timeout) {
 
 			// expose gridster methods to parent scope
 			scope.api = {
+				redraw: function() {
+					controller.redraw();
+				},
 				getNextPosition: function(sizeX, sizeY) {
 					return controller.getNextPosition(sizeX, sizeY);
 				},
@@ -29,60 +32,23 @@ app.directive('gridster', function($window, $timeout) {
 				}
 			};
 
-			var resize = function(e) {
+			// resolve gridster options if the window is resized
+			function onWindowResize(e) {
 				if (e.target === $window && windowResizeThrottle === null) {
 					windowResizeThrottle = $timeout(function() {
 						controller.resolveOptions();
 						windowResizeThrottle = null;
 					}, 200);
 				}
-			};
+			}
 
-			angular.element($window).bind('resize', resize);
+			angular.element($window).bind('resize', onWindowResize);
 
 			scope.$on('$destroy', function() {
-				angular.element($window).unbind('resize', resize);
+				angular.element($window).unbind('resize', onWindowResize);
 			});
 
 			controller.init($element);
-
-			if (interact.supportsTouch() === true) {
-				//var element = $element[0];
-
-				//element.addEventListener('gesturestart', function(e) {
-				//e.preventDefault(e);
-
-				//scope.$broadcast('gridster.gesture_start', e);
-				//}, false);
-
-				//element.addEventListener('gesturechange', function(e) {
-				//e.preventDefault(e);
-
-				//scope.$broadcast('gridster.gesture_move', e);
-				//}, false);
-
-				//element.addEventListener('gestureend', function(e) {
-				//e.preventDefault(e);
-				//scope.$broadcast('gridster.gesture_end', e);
-				//}, false);
-
-				//element.addEventListener('dragstart', function (e) {
-				//e.preventDefault();
-				//});
-
-				//interact(element).gesturable({
-				//onstart: function(e) {
-				//scope.$broadcast('gridster.gesture_start', e);
-				//},
-				//onmove: function(e) {
-				//scope.$broadcast('gridster.gesture_move', e);
-				//},
-				//onend: function(e) {
-				//scope.$broadcast('gridster.gesture_end', e);
-				//}
-				//});
-			}
-
 		}
 	};
-});
+}]);

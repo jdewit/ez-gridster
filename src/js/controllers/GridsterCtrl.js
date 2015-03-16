@@ -3,6 +3,8 @@
  */
 app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 
+	var self = this;
+
 	/**
 	 * The grid element
 	 */
@@ -30,6 +32,28 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 
 		// merge user provided options
 		angular.extend($scope.options, $scope.config);
+
+		this.resolveOptions();
+
+		if (this.getOption('scrollEdgeEnabled') && !$('.gridster-scroll-edge').length) {
+			var $topEdgeEl = angular.element('<div class="gridster-scroll-edge top-edge"></div>');
+
+			var $bottomEdgeEl = angular.element('<div class="gridster-scroll-edge bottom-edge"></div>');
+
+			// required since the edges move on the page
+			interact.dynamicDrop(true);
+
+			this.addScrollEdge($topEdgeEl[0], -200);
+			this.addScrollEdge($bottomEdgeEl[0], 200);
+		}
+	};
+
+	/**
+	 * set gridster as being loaded
+	 */
+	this.setLoaded = function() {
+		$scope.options.isLoaded = true;
+		$scope.$broadcast('ez-gridster.loaded');
 	};
 
 	/**
@@ -42,6 +66,27 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		} else {
 			return $scope.options[key];
 		}
+	};
+
+	/**
+	 * Set an option
+	 */
+	this.setOption = function(key, value) {
+		if ($scope.options.modes[$scope.options.mode].hasOwnProperty(key)) {
+			$scope.options.modes[$scope.options.mode][key] = value;
+		} else {
+			$scope.options[key] = value;
+		}
+	};
+
+	/**
+	 * Redraw the grid
+	 */
+	this.redraw = function() {
+		this.moveAllOverlappingItems();
+		this.floatItemsUp();
+		this.updateGridHeight();
+		this.setElements();
 	};
 
 	/**
@@ -66,52 +111,68 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	};
 
 	/**
-	 * Fire loaded events & add loaded class
+	 * Add class to gridster container
 	 */
-	this.setLoaded = function(val) {
-		if (val === true) {
-			$scope.options.isLoaded = true;
-			$rootScope.$broadcast('angular-gridster.loaded');
-			$gridElement.addClass('gridster-loaded');
-		} else {
-			$gridElement.removeClass('gridster-loaded');
-			$scope.options.isLoaded = false;
-		}
+	this.addClass = function(name) {
+		$gridElement.addClass(name);
+	};
+
+	/**
+	 * Add class to gridster container
+	 */
+	this.removeClass = function(name) {
+		$gridElement.removeClass(name);
 	};
 
 	/**
 	 * Resolve options relating to screen size
 	 */
 	this.resolveOptions = function() {
-		var mode, modeOptions, modeChanged;
+		var _mode = $scope.options.mode,
+			modeOptions,
+			widthChanged,
+			_width
+		;
 
-		$scope.options.curWidth = $gridElement[0].offsetWidth;
+		_width = $gridElement[0].offsetWidth;
 
-		$gridElement.removeClass('gridster-' + $scope.options.mode);
-
-		for (mode in $scope.options.modes) {
-			if (!$scope.options.modes.hasOwnProperty(mode) || mode === $scope.options.mode) {
-				continue;
-			}
-
+		for (var mode in $scope.options.modes) {
 			modeOptions = $scope.options.modes[mode];
 
-			if ($scope.options.curWidth >= modeOptions.minThreshold && $scope.options.curWidth <= modeOptions.maxThreshold) {
-				modeChanged = true;
-				$scope.options.mode = mode;
+			if (
+				_width >= modeOptions.minThreshold &&
+				_width <= modeOptions.maxThreshold
+			) {
+				if (mode !== _mode) {
+					$scope.options.mode = mode;
+
+					this.removeClass('gridster-' + _mode);
+					this.addClass('gridster-' + mode);
+				}
 
 				break;
 			}
 		}
 
-		$gridElement.addClass('gridster-' + $scope.options.mode);
+		if (this.getOption('previewEnabled')) {
+			$gridElement.addClass('gridster-preview-enabled');
+		} else {
+			$gridElement.removeClass('gridster-preview-enabled');
+		}
 
 		if (this.getOption('width') !== 'auto') {
 			$scope.options.curWidth = this.getOption('width');
 		}
 
+		_width = _width - (2 * this.getOption('padding')[0]);
+
+		if (_width !== $scope.options.curWidth) {
+			$scope.options.curWidth = _width;
+			widthChanged = true;
+		}
+
 		if (this.getOption('colWidth') === 'auto') {
-			$scope.options.curColWidth = ($scope.options.curWidth - this.getOption('margins')[0]) / this.getOption('columns');
+			$scope.options.curColWidth = $scope.options.curWidth / this.getOption('columns');
 		} else {
 			$scope.options.curColWidth = this.getOption('colWidth');
 		}
@@ -122,80 +183,51 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 			$scope.options.curRowHeight = this.getOption('rowHeight');
 		}
 
-		if ($scope.options.isLoaded === true) {
-			$rootScope.$broadcast('angular-gridster.grid_changed', $scope.options);
-
-			if (modeChanged === true) {
-				this.moveAllOverlappingItems();
+		if ($scope.options.isLoaded) {
+		   	if (widthChanged) {
+				$scope.$broadcast('ez-gridster.updated', $scope.options);
 			}
+		} else {
+			this.addClass('gridster-' + $scope.options.mode);
 		}
-	};
-
-	/**
-	 * Show preview element
-	 */
-	this.showPreviewElement = function() {
-		previewElement.style.opacity = '1';
-	};
-
-	/**
-	 * Hide preview element
-	 */
-	this.hidePreviewElement = function() {
-		previewElement.style.opacity = '0';
-	};
-
-	this.startMove = function() {
-		$gridElement.addClass('gridster-moving');
-	};
-
-	/**
-	 * Hide grid item overlay elements
-	 */
-	this.endMove = function() {
-		$gridElement.removeClass('gridster-moving');
 	};
 
 	/**
 	 * Check if item can occupy a specified position in the grid
 	 */
 	this.canItemOccupy = function(row, col, sizeX, sizeY, excludeItems) {
-		var canOccupy = true;
-
-		if (row < 0 || col < 0 || (row + sizeY) > this.getOption('maxRows') || (col + sizeX) > this.getOption('columns') || this.getItemsInArea(row, col, sizeX, sizeY, excludeItems).length > 0) {
-			canOccupy = false;
+		if (
+			row < 0 ||
+			col < 0 ||
+			(row + sizeY) > this.getOption('maxRows') ||
+			(col + sizeX) > this.getOption('columns') ||
+			this.getItemsInArea(row, col, sizeX, sizeY, excludeItems).length > 0
+		) {
+			return false;
 		}
 
-		return canOccupy;
+		return true;
 	};
 
 	/**
 	 * Gets items within an area
 	 */
 	this.getItemsInArea = function(row, col, sizeX, sizeY, excludeItems) {
-		var items = [],
-			item, trackByProperty;
+		var items = [], item;
 
-		trackByProperty = this.getOption('trackByProperty');
-
-		if (excludeItems && !(excludeItems instanceof Array)) {
+		if (!!excludeItems && !(excludeItems instanceof Array)) {
 			excludeItems = [excludeItems];
 		}
 
-		loop1: for (var i = 0, itemCount = $scope.items.length; i < itemCount; i++) {
+		for (var i = 0, itemCount = $scope.items.length; i < itemCount; i++) {
 			item = $scope.items[i];
 
-			if (excludeItems) {
-				// continue if item an item to be excluded
-				for (var j = 0, excludeItemCount = excludeItems.length; j < excludeItemCount; j++) {
-					if (excludeItems[j][trackByProperty] === item[trackByProperty]) {
-						continue loop1;
-					}
-				}
+			if (!!excludeItems && excludeItems.indexOf(item) !== -1) {
+				continue;
 			}
 
-			if (this.isItemHidden(item) !== true && this.isItemInArea(item, row, col, sizeX, sizeY)) {
-				items.unshift(item);
+			if (!this.isItemHidden(item) && this.isItemInArea(item, row, col, sizeX, sizeY)) {
+				items.push(item);
 			}
 		}
 
@@ -245,11 +277,10 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	};
 
 	/**
-	 * Fix an items position/size values for each view mode
+	 * Resolve an items position & size values for all view modes
 	 */
 	this.fixItem = function(item) {
-		var _item = item,
-			_mode = $scope.options.mode,
+		var	_mode = $scope.options.mode,
 			defaultSizeX = this.getOption('defaultSizeX'),
 			defaultSizeY = this.getOption('defaultSizeY'),
 			mode,
@@ -264,57 +295,59 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 			$scope.options.mode = mode;
 
 			// resolve sizeX
-			sizeX = this.resolveParam(this.getSizeX(_item), defaultSizeX);
+			sizeX = this.resolveParam(this.getSizeX(item), defaultSizeX);
 			if (sizeX < this.getOption('minSizeX')) {
 				sizeX = defaultSizeX;
 			}
-			_item = this.setSizeX(_item, sizeX);
+			item = this.setSizeX(item, sizeX);
 
 			// resolve sizeY
-			sizeY = this.resolveParam(this.getSizeY(_item), defaultSizeY);
+			sizeY = this.resolveParam(this.getSizeY(item), defaultSizeY);
 			if (sizeY < this.getOption('minSizeY')) {
 				sizeY = defaultSizeY;
 			}
-			_item = this.setSizeY(_item, sizeY);
+			item = this.setSizeY(item, sizeY);
 
 			// resolve row/col
-			row = this.resolveParam(this.getRow(_item));
-			col = this.resolveParam(this.getCol(_item));
-			if (typeof row !== 'number' || typeof col !== 'number' || row > this.getOption('maxRows') || col >= this.getOption('columns')) {
-				if ($scope.options.isLoaded === true) {
-					position = this.getNextPosition(sizeX, sizeY, item);
+			row = this.getRow(item);
+			col = this.getCol(item);
 
-					// item must be too big for the grid, set to default size
+			if (
+				row === null ||
+				col === null ||
+				row > this.getOption('maxRows') ||
+				col >= this.getOption('columns') ||
+				this.getItemsInArea(row, col, sizeX, sizeY, item).length > 0
+			) {
+				position = this.getNextPosition(sizeX, sizeY, item);
+
+				// item must be too big for the grid, set to default size
+				if (position === false) {
+					item = this.setSizeX(item, defaultSizeX);
+					item = this.setSizeY(item, defaultSizeY);
+
+					position = this.getNextPosition(null, null, item);
+
 					if (position === false) {
-						_item = this.setSizeX(_item, defaultSizeX);
-						_item = this.setSizeY(_item, defaultSizeY);
-
-						position = this.getNextPosition(null, null, item);
-
-						if (position === false) {
-							throw new Error('No positions available');
-						}
+						throw new Error('No positions available');
 					}
-
-					row = position.row;
-					col = position.col;
-				} else {
-					row = 0;
-					col = 0;
 				}
+
+				row = position.row;
+				col = position.col;
 			}
 
-			_item = this.setRow(_item, row);
-			_item = this.setCol(_item, col);
+			item = this.setRow(item, row);
+			item = this.setCol(item, col);
 		}
 
 		// revert back to the current mode
 		$scope.options.mode = _mode;
 
-		// update item in items array
-		$scope.items[$scope.items.indexOf(item)] = _item;
 
-		return _item;
+		if (this.getOption('floatItemsUp')) {
+			this.floatItemUp(item, true);
+		}
 	};
 
 	/**
@@ -342,11 +375,11 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	 * Move other items in the way up or down
 	 */
 	this.moveOverlappingItems = function(item, allowMoveUp) {
-		var items, row, col, sizeX, sizeY, _row, _col, _sizeX, _sizeY;
-
 		if (this.getOption('moveOverlappingItems') === false || this.isItemHidden(item)) {
 			return;
 		}
+
+		var items, row, col, sizeX, sizeY, _row, _col, _sizeX, _sizeY;
 
 		row = this.getRow(item);
 		col = this.getCol(item);
@@ -362,7 +395,8 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 			_sizeY = this.getSizeY(items[i]);
 
 			// try to move item up first
-			if (allowMoveUp === true &&
+			if (
+				allowMoveUp === true &&
 				row > 0 &&
 				this.canItemOccupy(
 					_row - (sizeY + _sizeY - 1),
@@ -372,21 +406,21 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 					items[i]
 				)
 			) {
+				// move above
 				items[i] = this.setRow(items[i], _row - (sizeY + _sizeY - 1));
 			} else {
-				// ok, down you go
+				// move below
 				items[i] = this.setRow(items[i], row + sizeY);
-
-				this.moveOverlappingItems(items[i]);
 			}
 
-			if ($scope.options.isLoaded) {
-				this.translateElementPosition(
-					this.getItemElement(items[i][this.getOption('trackByProperty')]),
-					this.colToPixels(this.getCol(items[i])),
-					this.rowToPixels(this.getRow(items[i]))
-				);
-			}
+			this.translateElementPosition(
+				this.getItemElement(items[i][this.getOption('trackByProperty')]),
+				this.colToPixels(this.getCol(items[i])),
+				this.rowToPixels(this.getRow(items[i]))
+			);
+
+			this.moveOverlappingItems(items[i], false, true);
+
 		}
 	};
 
@@ -404,26 +438,33 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	};
 
 	/**
-	 * Move items up into empty space
+	 * Move any items up into empty space if they can fit
 	 */
 	this.floatItemsUp = function() {
 		if (this.getOption('floatItemsUp') === false || !$scope.items) {
 			return;
 		}
 
+		var wasFloated = false;
 		for (var i = 0; i < $scope.items.length; i++) {
-			if ($scope.items[i]._moving === true) {
-				continue;
+			// start over again if item was floated up
+			if (this.floatItemUp($scope.items[i])) {
+				wasFloated = true;
 			}
+		}
 
-			this.floatItemUp($scope.items[i]);
+		if (wasFloated) {
+			// keep going until no more items are floated up
+			this.floatItemsUp();
 		}
 	};
 
 	/**
 	 * Float an item up to the most suitable row
+	 *
+	 * @returns {boolean} True if item was moved, False if not moved
 	 */
-	this.floatItemUp = function(item) {
+	this.floatItemUp = function(item, noMove) {
 		var items, row, col, sizeX, sizeY, bestRow = null;
 
 		row = this.getRow(item) - 1;
@@ -446,22 +487,35 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		if (bestRow !== null) {
 			item = this.setRow(item, bestRow);
 
-			this.translateElementPosition(
-				this.getItemElement(item[this.getOption('trackByProperty')]),
-				this.colToPixels(col),
-				this.rowToPixels(bestRow)
-			);
+			if (!noMove) {
+				this.translateElementPosition(
+					this.getItemElement(item[this.getOption('trackByProperty')]),
+					this.colToPixels(col),
+					this.rowToPixels(bestRow)
+				);
+			}
+
+			return true;
 		}
+
+		return false;
 	};
 
 	/**
 	 * Update gridsters height if item is the lowest
 	 */
-	this.updateGridHeight = function() {
+	this.updateGridHeight = function(movingItem) {
 		var maxRows = 0,
-			itemMaxRow, height;
+			minRows = this.getOption('minRows'),
+			itemMaxRow,
+			height = 0
+		;
 
-		maxRows = this.getOption('minRows');
+		if (minRows === 'auto') {
+			maxRows = this.getOption('defaultSizeY');
+		} else {
+			maxRows = minRows;
+		}
 
 		if ($scope.items) {
 			for (var j = 0; j < $scope.items.length; j++) {
@@ -474,15 +528,17 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		}
 
 		// add empty space for items to move to
-		maxRows += this.getOption('defaultSizeY');
+		if (!!movingItem) {
+			maxRows += this.getSizeY(movingItem);
+		}
 
 		if (maxRows > this.getOption('maxRows')) {
 			maxRows = this.getOption('maxRows');
 		}
 
-		height = maxRows * this.getOption('curRowHeight') + this.getOption('margins')[1];
+		height = maxRows * this.getOption('curRowHeight') + (2 * this.getOption('padding')[1]);
 
-		$gridElement[0].style.height = height + 'px';
+		$gridElement.height(height);
 	};
 
 	/**
@@ -531,14 +587,14 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	 * Returns the row in pixels
 	 */
 	this.rowToPixels = function(row) {
-		return row * $scope.options.curRowHeight + this.getOption('margins')[0];
+		return row * $scope.options.curRowHeight + (2 * this.getOption('padding')[1]);
 	};
 
 	/**
 	 * Returns the column in pixels
 	 */
 	this.colToPixels = function(col) {
-		return col * $scope.options.curColWidth + this.getOption('margins')[1];
+		return col * $scope.options.curColWidth + (2 * this.getOption('padding')[0]);
 	};
 
 	/**
@@ -548,6 +604,10 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		var transform;
 
 		if (el === null) {
+			if (!this.getOption('previewEnabled')) {
+				return;
+			}
+
 			el = previewElement;
 		}
 
@@ -569,21 +629,18 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	 */
 	this.setElementHeight = function(el, sizeY) {
 		var height;
-		if (!$scope.options.isLoaded) { // need to make sure grid isLoaded so css height transition isn't clobbered
-			return 0;
-		}
 
-		height = parseFloat((sizeY * $scope.options.curRowHeight).toFixed(2), 10) - this.getOption('margins')[0] + 'px';
+		height = sizeY * $scope.options.curRowHeight - (2 * this.getOption('padding')[1]) + 'px';
 
 		if (el === null) {
+			if (!this.getOption('previewEnabled')) {
+				return;
+			}
+
 			el = previewElement;
 		}
 
 		el.style.height = height;
-
-		$scope.$broadcast('angular_gridster.element_height_changed', el, height);
-
-		return height;
 	};
 
 	/**
@@ -593,40 +650,41 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		var width;
 
 		if (el === null) {
+			if (!this.getOption('previewEnabled')) {
+				return;
+			}
+
 			el = previewElement;
 		}
 
-		width = parseFloat((sizeX * $scope.options.curColWidth).toFixed(2)) - this.getOption('margins')[1] + 'px';
+		width = sizeX * $scope.options.curColWidth - (2 * this.getOption('padding')[0]) + 'px';
 
 		el.style.width = width;
-
-		return width;
 	};
 
 	/**
 	 * Set an items DOM element in the grid
 	 */
-	this.setElement = function(el, item, ignoreHeight) {
-		if (el !== null && this.isItemHidden(item)) {
-			el.style.display = 'none';
-			return;
-		} else if (el !== null) {
-			el.style.display = 'block';
-		}
-
+	this.setElement = function(el, item, init) {
 		if (el === null) {
+			if (!this.getOption('previewEnabled')) {
+				return;
+			}
+
 			el = previewElement;
+		} else {
+			if (this.isItemHidden(item)) {
+				el.style.display = 'none';
+				return;
+			} else {
+				el.style.display = 'block';
+			}
 		}
 
-		this.setElementWidth(el, this.getSizeX(item));
+		this.translateElementPosition(el, this.colToPixels(this.getCol(item)), this.rowToPixels(this.getRow(item)));
 
-		this.translateElementPosition(
-			el,
-			this.colToPixels(this.getCol(item)),
-			this.rowToPixels(this.getRow(item))
-		);
-
-		if (!ignoreHeight) {
+		if (!init) {
+			this.setElementWidth(el, this.getSizeX(item));
 			this.setElementHeight(el, this.getSizeY(item));
 		}
 	};
@@ -683,7 +741,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		}
 
 		if (!item[$scope.options.mode].hasOwnProperty(property)) {
-			item[$scope.options.mode][property] = 0;
+			item[$scope.options.mode][property] = null;
 		}
 
 		return item[$scope.options.mode][property];
@@ -753,7 +811,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 			val = min;
 		}
 
-		var max = this.getOption('columns');
+		var max = this.getOption('columns') - item[this.getOption('colProperty')];
 		if (val > max) {
 			val = max;
 		}
@@ -777,7 +835,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 			val = min;
 		}
 
-		var max = this.getOption('maxRows');
+		var max = this.getOption('maxRows') - item[this.getOption('rowProperty')];
 		if (val > max) {
 			val = max;
 		}
@@ -785,15 +843,84 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		return this.setItemProperty(item, $scope.options.sizeYProperty, val);
 	};
 
+	/**
+	 * Is the item hidden?
+	 */
 	this.isItemHidden = function(item) {
 		return item.hasOwnProperty($scope.options.mode) ? item[$scope.options.mode].hidden : false;
 	};
 
-	this.setGestureItem = function(item) {
-		$scope.gestureItem = item;
+	/**
+	 * Returns the left, top position of the element
+	 */
+	this.getPosition = function(element) {
+		var values, top, left;
+		var $element = $(element);
+
+		var matrix = $element.css('-webkit-transform') ||
+			$element.css('-moz-transform') ||
+			$element.css('-ms-transform') ||
+			$element.css('-o-transform') ||
+			$element.css('transform');
+
+		if (typeof matrix !== 'string' || matrix === 'none') {
+			throw new Error('Your browser does not support css transforms');
+		}
+
+		values = matrix.split('(')[1].split(')')[0].split(',');
+
+		if (values.length < 4) {
+			left = parseInt(values[0].replace('px', ''), 10);
+			top = parseInt(values[1].replace('px', ''), 10);
+		} else {
+			left = parseInt(values[4].replace('px', ''), 10);
+			top = parseInt(values[5].replace('px', ''), 10);
+		}
+
+		return {
+			left: left,
+			top: top
+		};
 	};
 
-	this.setGestureElement = function(element) {
-		$scope.gestureElement = element;
+	/**
+	 * add dropzones to the top and bottom of the page that cause the page to scroll
+	 * when they are dragged over with a grid item
+	 */
+	this.addScrollEdge = function(edgeEl, diff) {
+		var dropMoveThrottle = null;
+
+		interact(edgeEl).dropzone({
+			acceptClass: '.gridster-item-moving',
+			overlap: 'center',
+			ondropmove: function() {
+				if (dropMoveThrottle === null) {
+
+					var scrollTop = $('body').scrollTop();
+
+					// we're already at the top
+					if (diff < 0 && scrollTop <= 0) {
+						return;
+					}
+
+					dropMoveThrottle = true;
+
+					$(self.getOption('scrollElSelector')).animate({
+						scrollTop: scrollTop + diff
+					}, 400);
+
+					if (diff > 0) {
+						$gridElement.height($gridElement.height() + diff);
+					}
+
+					setTimeout(function() {
+						dropMoveThrottle = null;
+					}, 400);
+				}
+			}
+		});
+
+		$('body').append(edgeEl);
 	};
+
 });

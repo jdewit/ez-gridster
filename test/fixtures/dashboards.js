@@ -54,7 +54,7 @@ var DASHBOARDS = [{
 		type: 'iframe',
 		tablet: {
 			col: 0,
-			row: 4,
+			row: 6,
 			sizeX: 4,
 			sizeY: 4
 		}

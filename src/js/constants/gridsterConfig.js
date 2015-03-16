@@ -34,6 +34,7 @@ app.constant('gridsterConfig', {
 			minSizeY: 2
 		},
 		mobile: {
+			itemPadding: [0, 10],
 			columns: 6,
 			minThreshold: 0,
 			maxThreshold: 767,
@@ -43,10 +44,6 @@ app.constant('gridsterConfig', {
 			minSizeY: 3
 		}
 	},
-
-	/**
-	 * The number of columns in the grid
-	 */
 
 	/**
 	 * The width of the grid.
@@ -69,10 +66,10 @@ app.constant('gridsterConfig', {
 	rowHeight: 'match',
 
 	/**
-	 * Row/column
-	 * @type {array}
+	 * The padding between grid items
+	 * @type {array} [x, y]
 	 */
-	margins: [10, 10],
+	padding: [10, 10],
 
 	/**
 	 * The minimum width of an item
@@ -88,9 +85,10 @@ app.constant('gridsterConfig', {
 
 	/**
 	 * The minimum amount of rows to show if the grid is empty
+	 * "auto" sets the height of the grid to fit the height of the grids container
 	 * @type {number}
 	 */
-	minRows: 12,
+	minRows: 'auto',
 
 	/**
 	 * The maximum amount of rows allowed in the grid
@@ -99,7 +97,12 @@ app.constant('gridsterConfig', {
 	maxRows: 1000,
 
 	/**
-	 * The items id property name
+	 * The time to wait for the items appear on initial load
+	 */
+	renderDelay: 500,
+
+	/**
+	 * The items track by property
 	 * @type {string}
 	 */
 	trackByProperty: 'id',
@@ -137,6 +140,12 @@ app.constant('gridsterConfig', {
 	moveOverlappingItems: true,
 
 	/**
+	 * Allow items to be dragged if true
+	 * @type {boolean}
+	 */
+	dragEnabled: true,
+
+	/**
 	 * Allow items to be resized if true
 	 * @type {boolean}
 	 */
@@ -149,15 +158,24 @@ app.constant('gridsterConfig', {
 	iframeFix: true,
 
 	/**
-	 * Show preview holder during resizing
+	 * Show preview holder during dragging/resizing
 	 * @type {boolean}
 	 */
-	resizablePreviewEnabled: true,
+	previewEnabled: true,
 
 	/**
-	 * Show preview holder during dragging
-	 * @type {boolean}
+	 * Scroll page if dragging or resizing near page limits
 	 */
-	draggablePreviewEnabled: true
+	scrollEdgeEnabled: true,
+
+	/**
+	 * The scroll element selector
+	 */
+	scrollElSelector: 'html,body',
+
+	/**
+	 * The grid container element to get the height from
+	 */
+	gridContainerSelector: 'window'
 
 });

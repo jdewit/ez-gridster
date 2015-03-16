@@ -1,55 +1,39 @@
 angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 
-.controller('DashboardCtrl', ['$scope', '$timeout',
+.controller('DashboardCtrl', [
+	'$scope', '$timeout',
 	function($scope, $timeout) {
-		var setIframeHeight = function(el, height) {
-			var frames = el.getElementsByTagName('iframe');
-			if (frames.length) {
-				frames[0].style.height = (height - 2) + 'px';
-			}
-		};
 
 		$scope.$on('gridster.loaded', function() {
-			//setTimeout(function() {
-				//var els = document.getElementsByClassName('gridster-item');
-				//for (var i=0, l=els.length; i<l; i++) {
-					//var height = els[i].offsetHeight;
-
-					//setIframeHeight(els[i], height);
-				//}
-			//}, 500);
+			console.log('gridster loaded');
 		});
 
 		$scope.gridsterOptions = {
-			margins: [20, 20],
 			trackByProperty: 'name',
-			resizable: {
-				onmove: function(e, $el, size) {
-					setIframeHeight($el[0], size.height);
-				}
-			},
-			updates: {
-				height: setIframeHeight
-			}
 		};
 
 		$scope.dashboards = DASHBOARDS;
 
 		$scope.gridster = {};
 
-		$scope.$on('gridster.item_changed', function(e, item) {
-			// update your dashboard on this event
-			// you probably want to debounce it since it gets fired a lot
-			console.log('item changed', item);
-		});
-
 		$scope.clear = function() {
 			$scope.dashboard.widgets = [];
 		};
 
 		$scope.addWidget = function() {
+			var minX = $scope.gridster.getOption('minX');
+			var minY = $scope.gridster.getOption('minY');
+
+			var nextPosition = $scope.gridster.getNextPosition(minX, minY);
+
+			console.log('next position => ', nextPosition);
+
 			var newItem = {
-				name: "New Widget" + ($scope.dashboard.widgets.length + 1)
+				name: "New Widget" + ($scope.dashboard.widgets.length + 1),
+				sizeX: nextPosition.sizeX,
+				sizeY: nextPosition.sizeY,
+				row: nextPosition.row,
+				col: nextPosition.col
 			};
 
 			console.log('save item to server', newItem);
@@ -64,20 +48,27 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 .controller('CustomWidgetCtrl', ['$scope', '$modal', '$timeout', '$sce',
 	function($scope, $modal, $timeout, $sce) {
 
-		console.log($scope);
-
 		$scope.remove = function() {
 			$scope.dashboard.widgets.splice($scope.dashboard.widgets.indexOf(scope.item), 1);
 		};
 
-		$scope.style = {
-			'background-image': 'url("' + $scope.item.src +'")'
+		if ($scope.item.src) {
+			$scope.style = {
+				'background-image': 'url("' + $scope.item.src +'")'
+			};
+
+			$scope.src = $sce.trustAsResourceUrl($scope.item.src);
+		}
+
+		$scope.widgetSet = function(e) {
+			var frames = e.element.find('iframe');
+			if (frames.length) {
+				frames[0].style.height = (e.element.height() - 2) + 'px';
+			}
+
 		};
 
-		$scope.src = $sce.trustAsResourceUrl($scope.item.src);
-
 		$scope.openSettings = function() {
-			alert('click');
 			$modal.open({
 				scope: $scope,
 				templateUrl: 'demo/views/widget_settings.html',

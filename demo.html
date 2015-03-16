@@ -4,7 +4,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<title>Angular Gridster</title>
 		<meta name="description" content="" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.css" rel="stylesheet">
 		<link rel="stylesheet" href="dist/ez-gridster.min.css" />
@@ -13,7 +13,7 @@
 
 		<script src="dist/modernizr.custom.js"></script>
 		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-		<script src="//rawgit.com/taye/interact.js/master/interact.js"></script>
+		<script src="//rawgit.com/taye/interact.js/v1.2.4/interact.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.0/ui-bootstrap-tpls.min.js"></script>
 
@@ -22,10 +22,11 @@
 
 		<script src="test/fixtures/dashboards.js"></script>
 		<script src="demo/js/script.js"></script>
+
 	</head>
 
 	<body ng-app="app">
-		<div class="container">
+		<div class="container-fluid">
 			<h2><a href="#">ez-gridster</a></h2>
 			<hr>
 			<div ng-controller="DashboardCtrl">
@@ -37,7 +38,7 @@
 					</select>
 				</div>
 				<div gridster="gridsterOptions" items="dashboard.widgets" api="gridster">
-					<div ng-controller="CustomWidgetCtrl">
+					<div ng-controller="CustomWidgetCtrl" on-init="widgetSet" on-update="widgetSet">
 						<div class="widget-btns">
 							<a title="settings" ng-click="openSettings()"><i class="glyphicon glyphicon-cog"></i></a>
 							<a title="Remove widget" ng-click="remove()"><i class="glyphicon glyphicon-trash"></i></a>
