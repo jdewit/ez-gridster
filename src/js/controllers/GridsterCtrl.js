@@ -628,11 +628,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	/**
 	 * Sets an elements height
 	 */
-	this.setElementHeight = function(el, sizeY) {
-		var height;
-
-		height = sizeY * $scope.options.curRowHeight - (2 * this.getOption('padding')[1]) + 'px';
-
+	this.setElementHeight = function(el, height) {
 		if (el === null) {
 			if (!this.getOption('previewEnabled')) {
 				return;
@@ -640,6 +636,8 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 
 			el = previewElement;
 		}
+
+		height = height - (4 * this.getOption('padding')[1]) + 'px';
 
 		el.style.height = height;
 	};
@@ -647,9 +645,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	/**
 	 * Sets an elements width
 	 */
-	this.setElementWidth = function(el, sizeX) {
-		var width;
-
+	this.setElementWidth = function(el, width) {
 		if (el === null) {
 			if (!this.getOption('previewEnabled')) {
 				return;
@@ -658,7 +654,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 			el = previewElement;
 		}
 
-		width = sizeX * $scope.options.curColWidth - (2 * this.getOption('padding')[0]) + 'px';
+		width = width - (4 * this.getOption('padding')[0]) + 'px';
 
 		el.style.width = width;
 	};
@@ -685,8 +681,8 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		this.translateElementPosition(el, this.colToPixels(this.getCol(item)), this.rowToPixels(this.getRow(item)));
 
 		if (!init) {
-			this.setElementWidth(el, this.getSizeX(item));
-			this.setElementHeight(el, this.getSizeY(item));
+			this.setElementWidth(el, this.colToPixels(this.getSizeX(item)));
+			this.setElementHeight(el, this.rowToPixels(this.getSizeY(item)));
 		}
 	};
 

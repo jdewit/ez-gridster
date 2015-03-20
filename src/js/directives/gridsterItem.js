@@ -46,8 +46,8 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 				col,
 				sizeX,
 				sizeY,
-				top = 0,
-				left = 0,
+				top,
+				left,
 				width,
 				height,
 				minWidth,
@@ -197,8 +197,7 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 						scope.item = gridster.setSizeX(scope.item, sizeX);
 						scope.item = gridster.setSizeY(scope.item, sizeY);
 
-						gridster.setElementWidth(null, sizeX);
-						gridster.setElementHeight(null, sizeY);
+						gridster.setElement(null, scope.item);
 
 						onResizeMove({
 							event: e,
@@ -240,9 +239,7 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 						});
 
 					} else {
-
-						gridster.setElementWidth(element, gridster.getSizeX(scope.item));
-						gridster.setElementHeight(element, gridster.getSizeY(scope.item));
+						gridster.setElement(element, scope.item);
 
 						onResizeEnd({
 							event: e,
@@ -319,23 +316,36 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 			});
 
 			function init() {
-				gridster.setElementWidth(element, gridster.getSizeX(scope.item));
-				gridster.setElementHeight(element, gridster.getSizeY(scope.item));
+				gridster.setElementWidth(element, width);
+				gridster.setElementHeight(element, height);
 
 				$element.addClass('gridster-item-loaded');
 
 				onInit({
 					item: scope.item,
-					element: $element
+					element: $element,
+					size: {
+						width: width,
+						height: height,
+					},
+					position: {
+						left: left,
+						top: top
+					}
 				});
 			}
 
 			// init item
 			gridster.fixItem(scope.item);
 
-			gridster.addItemElement(scope.item[gridster.getOption('trackByProperty')], element);
+			left =	gridster.colToPixels(gridster.getCol(scope.item));
+			top = gridster.rowToPixels(gridster.getRow(scope.item));
+			width = gridster.colToPixels(gridster.getSizeX(scope.item));
+			height = gridster.rowToPixels(gridster.getSizeY(scope.item));
 
-			gridster.setElement(element, scope.item, true);
+			gridster.translateElementPosition(element, left, top);
+
+			gridster.addItemElement(scope.item[gridster.getOption('trackByProperty')], element);
 
 			if (!gridster.getOption('isLoaded')) {
 
