@@ -6,7 +6,7 @@ This is a fork of the excellent <a href="https://github.com/ManifestWebDesign/an
 
 ##Demo
 
-See <a href="https://cdn.rawgit.com/jdewit/ez-gridster/demo.html">Live Demo</a>
+See <a href="https://rawgit.com/jdewit/ez-gridster/master/demo.html">Live Demo</a>
 
 ##Usage
 
