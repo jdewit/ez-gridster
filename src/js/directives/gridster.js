@@ -32,14 +32,23 @@ app.directive('gridster', ['$window', '$timeout', function($window, $timeout) {
 				}
 			};
 
+			var resizeCallback = function() {
+				console.log('rezzz');
+				controller.resolveOptions();
+				windowResizeThrottle = null;
+			};
+
 			// resolve gridster options if the window is resized
 			function onWindowResize(e) {
-				if (e.target === $window && windowResizeThrottle === null) {
-					windowResizeThrottle = $timeout(function() {
-						controller.resolveOptions();
-						windowResizeThrottle = null;
-					}, 200);
+				if (e.target !== $window) {
+					return;
 				}
+
+				if (!!windowResizeThrottle) {
+					$timeout.cancel(windowResizeThrottle);
+				}
+
+				windowResizeThrottle = $timeout(resizeCallback, 200);
 			}
 
 			angular.element($window).bind('resize', onWindowResize);

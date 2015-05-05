@@ -8,6 +8,10 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 			console.log('gridster loaded');
 		});
 
+		$scope.$on('gridster.changed', function() {
+			console.log('gridster changed');
+		});
+
 		$scope.gridsterOptions = {
 			trackByProperty: 'name',
 		};

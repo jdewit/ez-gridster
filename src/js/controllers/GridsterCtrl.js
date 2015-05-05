@@ -1,7 +1,7 @@
 /**
  * GridsterCtrl
  */
-app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
+app.controller('GridsterCtrl', function($scope, $rootScope, GridsterConfig) {
 
 	var self = this;
 
@@ -28,7 +28,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		previewElement = $element[0].querySelector('.gridster-preview-holder');
 
 		// initialize options with gridster config
-		$scope.options = angular.extend({}, gridsterConfig);
+		$scope.options = angular.extend({}, GridsterConfig);
 
 		// merge user provided options
 		angular.extend($scope.options, $scope.config);
@@ -128,7 +128,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 	/**
 	 * Resolve options relating to screen size
 	 */
-	this.resolveOptions = function() {
+	this.resolveOptions = function(isInit) {
 		var _mode = $scope.options.mode,
 			modeOptions,
 			widthChanged,
@@ -185,7 +185,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, gridsterConfig) {
 		}
 
 		if ($scope.options.isLoaded) {
-		   	if (widthChanged) {
+		   	if (widthChanged && !isInit) {
 				$scope.$broadcast('ez-gridster.updated', $scope.options);
 			}
 		} else {

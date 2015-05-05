@@ -41,6 +41,7 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 				onUpdate = getFn('on-update'),
 				dragInteract = null,
 				action = 'drag',
+				hasChanged,
 				padding,
 				row,
 				col,
@@ -67,6 +68,7 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 					$element.addClass('gridster-item-moving');
 
 					scope.item._moving = true;
+					hasChanged = false;
 
 					gridster.updateGridHeight(scope.item);
 
@@ -148,6 +150,8 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 							return;
 						}
 
+						hasChanged = true;
+
 						scope.item = gridster.setRow(scope.item, row);
 						scope.item = gridster.setCol(scope.item, col);
 
@@ -193,6 +197,8 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 						if (!gridster.hasItemWidthChanged(scope.item, sizeX) && !gridster.hasItemHeightChanged(scope.item, sizeY)) {
 							return;
 						}
+
+						hasChanged = true;
 
 						scope.item = gridster.setSizeX(scope.item, sizeX);
 						scope.item = gridster.setSizeY(scope.item, sizeY);
@@ -268,6 +274,10 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 						item: scope.item,
 						element: $element
 					});
+
+					if (hasChanged) {
+						scope.$emit('ez-gridster.changed');
+					}
 				}
 
 			}).on('hold', function (e) {
@@ -296,10 +306,14 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 			scope.$on('ez-gridster.updated', function() {
 				gridster.setElement(element, scope.item);
 
-				onUpdate({
-					item: scope.item,
-					element: $element
-				});
+				if (gridster.getOption('isLoaded') && !scope.item._moving) {
+					onUpdate({
+						item: scope.item,
+						element: $element
+					});
+
+					scope.$emit('ez-gridster.changed');
+				}
 			});
 
 			scope.$on('$destroy', function() {
@@ -365,7 +379,7 @@ app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) 
 
 					// resolve again in case of scrollbars
 					$timeout(function() {
-						gridster.resolveOptions();
+						gridster.resolveOptions(true);
 						gridster.updateGridHeight();
 					}, delay + 500);
 				}
