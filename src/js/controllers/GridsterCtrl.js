@@ -31,7 +31,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
     $scope.options = angular.extend({}, EzGridsterConfig);
 
     // merge user provided options
-    angular.extend($scope.options, $scope.config);
+    $.extend(true, $scope.options, $scope.config);
 
     this.resolveOptions();
 
@@ -39,9 +39,6 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
       var $topEdgeEl = angular.element('<div class="gridster-scroll-edge top-edge"></div>');
 
       var $bottomEdgeEl = angular.element('<div class="gridster-scroll-edge bottom-edge"></div>');
-
-      // required since the edges move on the page
-      interact.dynamicDrop(true);
 
       this.addScrollEdge($topEdgeEl[0], -200);
       this.addScrollEdge($bottomEdgeEl[0], 200);
