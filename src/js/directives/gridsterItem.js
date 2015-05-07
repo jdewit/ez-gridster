@@ -4,13 +4,13 @@
  * @param {object} $timeout
  * @param {object} $parse
  */
-app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) {
+app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse) {
   return {
     restrict: 'A',
-    require: '^gridster',
+    require: '^ezGridster',
     replace: true,
     scope: {
-      item: '=gridsterItem'
+      item: '=ezGridsterItem'
     },
     link: function(scope, $element, attrs, gridster) {
 

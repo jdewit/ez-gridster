@@ -1,13 +1,13 @@
 /**
  * @name gridsterDirective
  */
-app.directive('gridster', ['$window', '$timeout', function($window, $timeout) {
+app.directive('ezGridster', ['$window', '$timeout', function($window, $timeout) {
   return {
     restrict: 'EA',
-    controller: 'GridsterCtrl',
+    controller: 'EzGridsterCtrl',
     scope: {
       items: '=',
-      config: '=?gridster',
+      config: '=?ezGridster',
       api: '=?'
     },
     templateUrl: 'ez-gridster-tpl.html',
@@ -33,7 +33,6 @@ app.directive('gridster', ['$window', '$timeout', function($window, $timeout) {
       };
 
       var resizeCallback = function() {
-        console.log('rezzz');
         controller.resolveOptions();
         windowResizeThrottle = null;
       };

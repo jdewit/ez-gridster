@@ -1,7 +1,7 @@
 /**
  * GridsterCtrl
  */
-app.controller('GridsterCtrl', function($scope, $rootScope, GridsterConfig) {
+app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', function($scope, $rootScope, EzGridsterConfig) {
 
   var self = this;
 
@@ -28,7 +28,7 @@ app.controller('GridsterCtrl', function($scope, $rootScope, GridsterConfig) {
     previewElement = $element[0].querySelector('.gridster-preview-holder');
 
     // initialize options with gridster config
-    $scope.options = angular.extend({}, GridsterConfig);
+    $scope.options = angular.extend({}, EzGridsterConfig);
 
     // merge user provided options
     angular.extend($scope.options, $scope.config);
@@ -919,4 +919,4 @@ app.controller('GridsterCtrl', function($scope, $rootScope, GridsterConfig) {
     $('body').append(edgeEl);
   };
 
-});
+}]);

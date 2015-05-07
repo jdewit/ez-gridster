@@ -5,7 +5,7 @@ var app = angular.module('ez.gridster', []);
  * @name gridsterConfig
  * @description  Provides angular-gridster with sensible defaults
  */
-app.constant('GridsterConfig', {
+app.constant('EzGridsterConfig', {
 
   /**
    * The available view modes

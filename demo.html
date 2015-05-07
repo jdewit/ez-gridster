@@ -37,7 +37,7 @@
 					<select class="form-control" style="width: 150px; margin-bottom: 20px; display:inline-block;" ng-change="changeDashboard()" ng-model="dashboard" ng-options="d.name for d in dashboards | orderBy:'id'">
 					</select>
 				</div>
-				<div gridster="gridsterOptions" items="dashboard.widgets" api="gridster">
+				<div ez-gridster="gridsterOptions" items="dashboard.widgets" api="gridster">
 					<div ng-controller="CustomWidgetCtrl" on-init="widgetSet" on-update="widgetSet">
 						<div class="widget-btns">
 							<a title="settings" ng-click="openSettings()"><i class="glyphicon glyphicon-cog"></i></a>
