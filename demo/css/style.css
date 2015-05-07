@@ -43,10 +43,10 @@ a {
 form {
   margin-bottom: 0;
 }
-.gridster {
+.ez-gridster {
   border: 1px solid #ccc;
 }
-.gridster.gridster-mobile {
+.ez-gridster.gridster-mobile {
   border: none;
 }
 

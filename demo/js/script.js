@@ -4,11 +4,11 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 	'$scope', '$timeout',
 	function($scope, $timeout) {
 
-		$scope.$on('gridster.loaded', function() {
+		$scope.$on('ez-gridster.loaded', function() {
 			console.log('gridster loaded');
 		});
 
-		$scope.$on('gridster.changed', function() {
+		$scope.$on('ez-gridster.updated', function() {
 			console.log('gridster changed');
 		});
 

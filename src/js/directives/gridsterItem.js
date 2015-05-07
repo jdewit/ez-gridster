@@ -293,14 +293,6 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
         }
       });
 
-      // bind click handler to resize elements to set action
-      if (gridster.getOption('resizableEnabled')) {
-        var eventName = interact.supportsTouch() ? 'touchstart' : 'mousedown';
-
-        $element.find('.resize-handle').bind(eventName, function() {
-          action = 'resize';
-        });
-      }
 
       // reset the element if gridster options have changed
       scope.$on('ez-gridster.updated', function() {
@@ -311,8 +303,6 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
             item: scope.item,
             element: $element
           });
-
-          scope.$emit('ez-gridster.changed');
         }
       });
 
@@ -328,6 +318,16 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
 
         gridster.updateGridHeight();
       });
+
+      // bind click handler to resize elements to set action
+      if (gridster.getOption('resizableEnabled')) {
+        var eventName = interact.supportsTouch() ? 'touchstart' : 'mousedown';
+
+        $element.find('.resize-handle').bind(eventName, function() {
+          action = 'resize';
+        });
+      }
+
 
       function init() {
         gridster.setElementWidth(element, width);
@@ -379,8 +379,7 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
 
           // resolve again in case of scrollbars
           $timeout(function() {
-            gridster.resolveOptions(true);
-            gridster.updateGridHeight();
+            gridster.resolveOptions();
           }, delay + 500);
         }
       } else {

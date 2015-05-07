@@ -243,6 +243,7 @@
     this.setLoaded = function() {
       $scope.options.isLoaded = true;
       this.addClass('gridster-loaded');
+      $scope.$emit('ez-gridster.loaded');
       $scope.$broadcast('ez-gridster.loaded');
     };
 
@@ -320,10 +321,10 @@
     this.resolveOptions = function(isInit) {
       var _mode = $scope.options.mode,
         modeOptions,
-        widthChanged,
+        widthChanged = false,
         _width;
 
-      _width = $gridElement[0].offsetWidth;
+      _width = $gridElement.width();
 
       for (var mode in $scope.options.modes) {
         modeOptions = $scope.options.modes[mode];
@@ -372,8 +373,10 @@
         $scope.options.curRowHeight = this.getOption('rowHeight');
       }
 
+      console.log($scope.options.isLoaded, widthChanged, isInit);
       if ($scope.options.isLoaded) {
         if (widthChanged && !isInit) {
+          $scope.$emit('ez-gridster.updated', $scope.options);
           $scope.$broadcast('ez-gridster.updated', $scope.options);
         }
       } else {
@@ -1464,14 +1467,6 @@
           }
         });
 
-        // bind click handler to resize elements to set action
-        if (gridster.getOption('resizableEnabled')) {
-          var eventName = interact.supportsTouch() ? 'touchstart' : 'mousedown';
-
-          $element.find('.resize-handle').bind(eventName, function() {
-            action = 'resize';
-          });
-        }
 
         // reset the element if gridster options have changed
         scope.$on('ez-gridster.updated', function() {
@@ -1482,8 +1477,6 @@
               item: scope.item,
               element: $element
             });
-
-            scope.$emit('ez-gridster.changed');
           }
         });
 
@@ -1499,6 +1492,16 @@
 
           gridster.updateGridHeight();
         });
+
+        // bind click handler to resize elements to set action
+        if (gridster.getOption('resizableEnabled')) {
+          var eventName = interact.supportsTouch() ? 'touchstart' : 'mousedown';
+
+          $element.find('.resize-handle').bind(eventName, function() {
+            action = 'resize';
+          });
+        }
+
 
         function init() {
           gridster.setElementWidth(element, width);
@@ -1550,8 +1553,7 @@
 
             // resolve again in case of scrollbars
             $timeout(function() {
-              gridster.resolveOptions(true);
-              gridster.updateGridHeight();
+              gridster.resolveOptions();
             }, delay + 500);
           }
         } else {
