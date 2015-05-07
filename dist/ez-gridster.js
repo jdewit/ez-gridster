@@ -3,7 +3,7 @@
  * @module ez-gridster
  *
  * @see
- * @version 0.5.0
+ * @version 0.4.2
  * @license MIT
  */
 (function(angular) {
@@ -713,7 +713,6 @@
           itemMaxRow = this.getRow($scope.items[j]) + this.getSizeY($scope.items[j]);
 
           if (itemMaxRow > maxRows) {
-            console.log('max item', $scope.items[j]);
             maxRows = itemMaxRow;
           }
         }
@@ -729,8 +728,6 @@
       }
 
       height = maxRows * this.getOption('curRowHeight') + (2 * this.getOption('padding')[1]);
-
-      console.log('hhh', height);
 
       $gridElement.height(height);
     };

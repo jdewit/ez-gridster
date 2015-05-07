@@ -521,7 +521,6 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
         itemMaxRow = this.getRow($scope.items[j]) + this.getSizeY($scope.items[j]);
 
         if (itemMaxRow > maxRows) {
-          console.log('max item', $scope.items[j]);
           maxRows = itemMaxRow;
         }
       }
@@ -537,8 +536,6 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
     }
 
     height = maxRows * this.getOption('curRowHeight') + (2 * this.getOption('padding')[1]);
-
-    console.log('hhh', height);
 
     $gridElement.height(height);
   };
