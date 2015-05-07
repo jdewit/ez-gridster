@@ -1181,6 +1181,7 @@
    * @name gridsterItemDirective
    *
    * @param {object} $timeout
+   * @param {object} $parse
    */
   app.directive('gridsterItem', ['$timeout', '$parse', function($timeout, $parse) {
     return {
@@ -1236,10 +1237,9 @@
           maxHeight,
           columns;
 
-
         // Set interact on the item
         dragInteract = interact(element).draggable({
-          manualStart: true,
+          manualStart: interact.supportsTouch(),
           dynamicDrop: true,
           onstart: function(e) {
             gridster.addClass('gridster-moving');
@@ -1458,19 +1458,17 @@
               scope.$emit('ez-gridster.changed');
             }
           }
-
         }).on('hold', function(e) {
-          var interaction = e.interaction;
+          // require tablets to use tab hold to begin interaction
+          if (interact.supportsTouch()) {
 
-          // ignore right clicks
-          if (e.button !== 0) {
-            return;
-          }
+            var interaction = e.interaction;
 
-          if (!interaction.interacting()) {
-            interaction.start({
-              name: 'drag'
-            }, e.interactable, e.currentTarget);
+            if (!interaction.interacting()) {
+              interaction.start({
+                name: 'drag'
+              }, e.interactable, e.currentTarget);
+            }
           }
         });
 
