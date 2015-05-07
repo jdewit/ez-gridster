@@ -33,7 +33,7 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 			console.log('next position => ', nextPosition);
 
 			var newItem = {
-				name: "New Widget" + Math.floor(Math.random() * 101),
+				name: "New Widget" + Math.floor(Math.random() * 100001),
 				sizeX: nextPosition.sizeX,
 				sizeY: nextPosition.sizeY,
 				row: nextPosition.row,
