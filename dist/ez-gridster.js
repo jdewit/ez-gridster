@@ -1130,12 +1130,8 @@
 
         // expose gridster methods to parent scope
         scope.api = {
-          redraw: function() {
-            controller.redraw();
-          },
-          getNextPosition: function(sizeX, sizeY) {
-            return controller.getNextPosition(sizeX, sizeY);
-          },
+          redraw: controller.redraw,
+          getNextPosition: controller.getNextPosition,
           getOption: function(key) {
             return scope.options[key];
           },
