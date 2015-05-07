@@ -1,14 +1,14 @@
 {
-	"name": "ez-gridster",
-	"version": "0.4.2",
-	"dependencies": {
-		"angular": "1.2.*",
-		"jquery": "1.11.*"
-	},
-	"devDependencies": {
-		"angular-mocks": "~1.2.0",
-		"jquery-simulate": "*",
-		"jquery-simulate-ext": "~1.3.0",
-		"interact": "1.2.*"
-	}
+  "name": "ez-gridster",
+  "version": "0.4.2",
+  "dependencies": {
+    "angular": "1.2.*",
+    "jquery": "1.11.*"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.2.0",
+    "jquery-simulate": "*",
+    "jquery-simulate-ext": "~1.3.0",
+    "interact": "1.2.*"
+  }
 }
