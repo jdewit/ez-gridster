@@ -52,7 +52,7 @@ app.directive('ezGridster', ['$window', '$timeout', function($window, $timeout) 
         angular.element($window).unbind('resize', onWindowResize);
       });
 
-      controller.init($element);
+      controller.load($element);
     }
   };
 }]);

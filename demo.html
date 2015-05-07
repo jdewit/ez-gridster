@@ -38,7 +38,7 @@
 					</select>
 				</div>
 				<div ez-gridster="gridsterOptions" items="dashboard.widgets" api="gridster">
-					<div ng-controller="CustomWidgetCtrl" on-init="widgetSet" on-update="widgetSet">
+					<div ng-controller="CustomWidgetCtrl" on-load="widgetSet" on-change="widgetSet">
 						<div class="widget-btns">
 							<a title="settings" ng-click="openSettings()"><i class="glyphicon glyphicon-cog"></i></a>
 							<a title="Remove widget" ng-click="remove()"><i class="glyphicon glyphicon-trash"></i></a>

@@ -8,7 +8,7 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 			console.log('gridster loaded');
 		});
 
-		$scope.$on('ez-gridster.updated', function() {
+		$scope.$on('ez-gridster.changed', function() {
 			console.log('gridster changed');
 		});
 
@@ -69,6 +69,7 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 		}
 
 		$scope.widgetSet = function(e) {
+      console.log('widget set', e);
 			var frames = e.element.find('iframe');
 			if (frames.length) {
 				frames[0].style.height = (e.element.height() - 2) + 'px';

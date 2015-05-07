@@ -23,7 +23,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
   /**
    * Sets gridster & previewElement elements
    */
-  this.init = function($element) {
+  this.load = function($element) {
     $gridElement = $element;
     previewElement = $element[0].querySelector('.gridster-preview-holder');
 
@@ -33,7 +33,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
     // merge user provided options
     $.extend(true, $scope.options, $scope.config);
 
-    this.resolveOptions();
+    this.resolveOptions(true);
 
     if (this.getOption('scrollEdgeEnabled') && !$('.gridster-scroll-edge').length) {
       var $topEdgeEl = angular.element('<div class="gridster-scroll-edge top-edge"></div>');
@@ -181,11 +181,10 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
       $scope.options.curRowHeight = this.getOption('rowHeight');
     }
 
-      console.log($scope.options.isLoaded, widthChanged, isInit);
     if ($scope.options.isLoaded) {
       if (widthChanged && !isInit) {
-        $scope.$emit('ez-gridster.updated', $scope.options);
-        $scope.$broadcast('ez-gridster.updated', $scope.options);
+        this.updateGridHeight();
+        this.setElements();
       }
     } else {
       this.addClass('gridster-' + $scope.options.mode);
@@ -522,6 +521,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
         itemMaxRow = this.getRow($scope.items[j]) + this.getSizeY($scope.items[j]);
 
         if (itemMaxRow > maxRows) {
+          console.log('max item', $scope.items[j]);
           maxRows = itemMaxRow;
         }
       }
@@ -537,6 +537,8 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
     }
 
     height = maxRows * this.getOption('curRowHeight') + (2 * this.getOption('padding')[1]);
+
+    console.log('hhh', height);
 
     $gridElement.height(height);
   };
