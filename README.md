@@ -1,14 +1,14 @@
 ez-gridster
 ===========
 
+A responsive grid/portlet directive that does all kinds of fancy stuff.
+
 This is a fork of the excellent <a href="https://github.com/ManifestWebDesign/angular-gridster">Manifest Web Designs angular-gridster directive</a>. I needed some features that required breaking some backwards compatibility. 
 
 
 ##Demo
 
 See <a href="https://rawgit.com/jdewit/ez-gridster/master/demo.html">Live Demo</a>
-
-##Usage
 
 ##Installation
 
@@ -18,15 +18,19 @@ See <a href="https://rawgit.com/jdewit/ez-gridster/master/demo.html">Live Demo</
 
 Then, import the following in your HTML alongside `jQuery` and `angular`:
 ```html
-  <link rel="stylesheet" href="dist/angular-gridster.min.css" />
-  <script src="src/angular-gridster.js"></script>
+  <link rel="stylesheet" href="dist/ez-gridster.min.css" />
+  <script src="dist/ez-gridster.min.js"></script>
+  <script src="dist/ez-gridster-tpl.min.js"></script>
 ```
 
-##usage 
+##Usage 
 
 In your view
 ```html
-<div gridster="items"></div>
+<div ez-gridster="items">
+  <img ng-src="{{ item.src }}"/>
+  <div>{{ item.name }}</div>
+</div>
 ```
 
 In your controller:
@@ -34,27 +38,34 @@ In your controller:
     $scope.items = [
 		{
 			name: 'Item 1',
-			col: 1,
-			row: 1,
-			sizeX: 3,
-			sizeY: 4
+      desktop: {
+        col: 1,
+        row: 1,
+        sizeX: 3,
+        sizeY: 4
+      },
+      tablet: {
+        col: 1,
+        row: 1,
+        sizeX: 3,
+        sizeY: 4
+      }
+      mobile: {
+        col: 1,
+        row: 1,
+        sizeX: 3,
+        sizeY: 4
+      }
 		}
+    //... more items
 	];
 ```
 
-
-
 ##Configuration
 
-See <a href="src/js/constants/gridsterConfig.js">gridsterConfig</a> constant.
+See <a href="src/js/constants/GridsterConfig.js">GridsterConfig</a> constant.
 
 ##Contributing
-
-####Install project dependencies
-```bash
-  npm install
-  bower install
-```
 
 ####Style Guide
 Please respect the formatting specified in .editorconfig
