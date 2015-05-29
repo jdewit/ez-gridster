@@ -8,6 +8,7 @@ app.directive('inject', function() {
   return {
     link: function($scope, $element, $attrs, controller, $transclude) {
       var innerScope = $scope.$new();
+
       $transclude(innerScope, function(clone) {
         $element.empty();
         $element.append(clone);

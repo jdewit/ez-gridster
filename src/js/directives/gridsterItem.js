@@ -31,7 +31,7 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
 
       var element = $element[0],
         $itemEl = $element.children(0).children(0),
-        itemScope = $itemEl.scope(),
+        itemScope = scope.$$nextSibling.$$childHead,
         onDragStart = getFn('on-drag-start'),
         onDragMove = getFn('on-drag-move'),
         onDragEnd = getFn('on-drag-end'),

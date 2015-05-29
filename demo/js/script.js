@@ -1,5 +1,14 @@
 angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 
+.config([
+  '$compileProvider',
+  function(
+    $compileProvider
+  ) {
+    $compileProvider.debugInfoEnabled(false);
+  }
+])
+
 .controller('DashboardCtrl', [
 	'$scope', '$timeout',
 	function($scope, $timeout) {
@@ -146,4 +155,5 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 		}
 		return out;
 	}
-});
+})
+;
