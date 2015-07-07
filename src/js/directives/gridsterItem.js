@@ -32,17 +32,10 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
       var element = $element[0],
         $itemEl = $element.children(0).children(0),
         itemScope = scope.$$nextSibling.$$childHead,
-        onDragStart = getFn('on-drag-start'),
-        onDragMove = getFn('on-drag-move'),
-        onDragEnd = getFn('on-drag-end'),
-        onResizeStart = getFn('on-resize-start'),
-        onResizeMove = getFn('on-resize-move'),
-        onResizeEnd = getFn('on-resize-end'),
-        onLoad = getFn('on-load'),
-        onChange = getFn('on-change'),
+        dispatch = getFn('event-handler'),
         dragInteract = null,
         action = 'drag',
-        hasChanged,
+        hasChanged = false,
         padding,
         row,
         col,
@@ -62,10 +55,8 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
       dragInteract = interact(element).draggable({
         manualStart: interact.supportsTouch(),
         dynamicDrop: true,
-        onstart: function(e) {
+        onstart: function() {
           gridster.addClass('gridster-moving');
-
-          $element.addClass('gridster-item-moving');
 
           scope.item._moving = true;
           hasChanged = false;
@@ -77,6 +68,11 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
           sizeX = gridster.getSizeX(scope.item);
           sizeY = gridster.getSizeY(scope.item);
 
+          top = gridster.rowToPixels(gridster.getRow(scope.item));
+          left = gridster.colToPixels(gridster.getCol(scope.item));
+          width = element.offsetWidth;
+          height = element.offsetHeight;
+
           gridster.setElement(null, scope.item);
 
           if (action === 'drag') {
@@ -87,24 +83,7 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
 
             columns = gridster.getOption('columns');
 
-            left = gridster.colToPixels(gridster.getCol(scope.item));
-            top = gridster.rowToPixels(gridster.getRow(scope.item));
-
-
-            onDragStart({
-              event: e,
-              item: scope.item,
-              element: $element,
-              position: {
-                top: top,
-                left: left
-              }
-            });
-
           } else {
-
-            width = element.offsetWidth;
-            height = element.offsetHeight;
 
             padding = gridster.getOption('padding');
 
@@ -113,17 +92,26 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
             minHeight = (gridster.getOption('minSizeY') * gridster.getOption('curRowHeight')) - (2 * padding[1]);
             maxHeight = (gridster.getOption('maxRows') - row) * gridster.getOption('curColHeight') - (2 * padding[1]);
 
-            onResizeStart({
-              event: e,
-              item: scope.item,
-              element: $element,
-              size: {
-                width: width,
-                height: height
-              }
-            });
-
           }
+
+          dispatch({
+            hasChanged: hasChanged,
+            event: {
+              action: action,
+              stage: 'start'
+            },
+            item: scope.item,
+            element: $element,
+            position: {
+              top: top,
+              left: left
+            },
+            size: {
+              width: width,
+              height: height
+            }
+          });
+
         },
         onmove: function(e) {
           if (action === 'drag') {
@@ -144,9 +132,9 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
               col = columns - sizeX;
             }
 
-            hasChanged = gridster.hasItemPositionChanged(scope.item, row, col);
-
-            if (!hasChanged) {
+            if (gridster.hasItemPositionChanged(scope.item, row, col)) {
+              hasChanged = true;
+            } else {
               return;
             }
 
@@ -158,16 +146,6 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
               gridster.colToPixels(col),
               gridster.rowToPixels(row)
             );
-
-            onDragMove({
-              event: e,
-              item: scope.item,
-              element: $element,
-              position: {
-                top: top,
-                left: left
-              }
-            });
 
           } else {
 
@@ -192,9 +170,10 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
             sizeX = gridster.pixelsToColumns(width, true);
             sizeY = gridster.pixelsToRows(height, true);
 
-            hasChanged = gridster.hasItemWidthChanged(scope.item, sizeX) || gridster.hasItemHeightChanged(scope.item, sizeY);
 
-            if (!hasChanged) {
+            if (gridster.hasItemWidthChanged(scope.item, sizeX) || gridster.hasItemHeightChanged(scope.item, sizeY)) {
+              hasChanged = true;
+            } else {
               return;
             }
 
@@ -202,27 +181,35 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
             scope.item = gridster.setSizeY(scope.item, sizeY);
 
             gridster.setElement(null, scope.item);
-
-            onResizeMove({
-              event: e,
-              item: scope.item,
-              element: $element,
-              size: {
-                width: width,
-                height: height
-              }
-            });
           }
+
+          dispatch({
+            hasChanged: hasChanged,
+            event: {
+              action: action,
+              stage: 'move'
+            },
+            item: scope.item,
+            element: $element,
+            position: {
+              top: top,
+              left: left
+            },
+            size: {
+              width: width,
+              height: height
+            }
+          });
 
           gridster.moveOverlappingItems(scope.item, true);
           gridster.updateGridHeight(scope.item);
         },
-        onend: function(e) {
+        onend: function() {
           delete scope.item._moving;
+
 
           gridster.removeClass('gridster-moving');
           $element.removeClass('gridster-item-moving');
-
 
           if (action === 'drag') {
 
@@ -232,28 +219,30 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
 
             gridster.translateElementPosition(element, gridster.colToPixels(col), gridster.rowToPixels(row));
 
-            onDragEnd({
-              event: e,
-              item: scope.item,
-              element: $element,
-              position: {
-                top: top,
-                left: left
-              }
-            });
-
           } else {
             gridster.setElement(element, scope.item);
+          }
 
-            onResizeEnd({
-              event: e,
-              item: scope.item,
-              element: $element,
-              size: {
-                width: width,
-                height: height
-              }
-            });
+          dispatch({
+            hasChanged: hasChanged,
+            event: {
+              action: action,
+              stage: 'end'
+            },
+            item: scope.item,
+            element: $element,
+            position: {
+              top: top,
+              left: left
+            },
+            size: {
+              width: gridster.colToPixels(gridster.getSizeX(scope.item), true),
+              height: gridster.rowToPixels(gridster.getSizeY(scope.item), true)
+            }
+          });
+
+          if (hasChanged) {
+            gridster.dispatchChangeEvent();
           }
 
           // reset action back to drag
@@ -262,17 +251,18 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
           gridster.floatItemsUp();
 
           gridster.updateGridHeight();
-
-          if (!hasChanged) {
-            onChange({
-              event: e,
-              item: scope.item,
-              element: $element
-            });
-
-            scope.$emit('ez-gridster.changed');
-          }
         }
+      }).actionChecker(function(e, action) {
+        // only left mouse button triggers draggable
+        if (!e || (e.which !== 1 && !interact.supportsTouch())) {
+          return false;
+        }
+
+        return action;
+      }).on('mousedown', function() {
+        $element.addClass('gridster-item-moving');
+      }).on('mouseup', function() {
+        $element.removeClass('gridster-item-moving');
       }).on('hold', function(e) {
         // require tablets to use tab hold to begin interaction
         if (interact.supportsTouch()) {
@@ -280,6 +270,9 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
           var interaction = e.interaction;
 
           if (!interaction.interacting()) {
+
+            $element.addClass('gridster-item-moving');
+
             interaction.start({
               name: 'drag'
             }, e.interactable, e.currentTarget);
@@ -288,6 +281,8 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
       });
 
       scope.$on('$destroy', function() {
+        // hide item right away otherwise transitions cause widget overlap
+        $element.hide();
         gridster.removeItemElement(scope.item[gridster.getOption('trackByProperty')]);
 
         if (dragInteract !== null) {
@@ -310,18 +305,29 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
       }
 
       // initialize this item
-      function load() {
-        gridster.setElementWidth(element, width);
-        gridster.setElementHeight(element, height);
+      function init() {
+        left = gridster.colToPixels(gridster.getCol(scope.item));
+        top = gridster.rowToPixels(gridster.getRow(scope.item));
+        width = gridster.colToPixels(gridster.getSizeX(scope.item));
+        height = gridster.rowToPixels(gridster.getSizeY(scope.item));
+
+        gridster.translateElementPosition(element, left, top);
 
         $element.addClass('gridster-item-loaded');
+        gridster.setElementHeight(element, height);
+        gridster.setElementWidth(element, width);
 
-        onLoad({
+        dispatch({
+          hasChanged: false,
+          event: {
+            action: 'resize',
+            stage: 'init'
+          },
           item: scope.item,
           element: $element,
           size: {
-            width: width,
-            height: height,
+            width: gridster.colToPixels(gridster.getSizeX(scope.item), true),
+            height: gridster.rowToPixels(gridster.getSizeY(scope.item), true)
           },
           position: {
             left: left,
@@ -330,54 +336,53 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
         });
       }
 
-      // load item
-      gridster.fixItem(scope.item);
+      scope.$on('ez-gridster.resized', function() {
+        width = gridster.colToPixels(gridster.getSizeX(scope.item), true);
+        height = gridster.rowToPixels(gridster.getSizeY(scope.item), true);
 
-      left = gridster.colToPixels(gridster.getCol(scope.item));
-      top = gridster.rowToPixels(gridster.getRow(scope.item));
-      width = gridster.colToPixels(gridster.getSizeX(scope.item));
-      height = gridster.rowToPixels(gridster.getSizeY(scope.item));
+        dispatch({
+          hasChanged: gridster.hasItemWidthChanged(scope.item, width) || gridster.hasItemHeightChanged(scope.item, height),
+          event: {
+            action: 'resize',
+            stage: 'end'
+          },
+          item: scope.item,
+          element: $element,
+          size: {
+            width: width,
+            height: height
+          },
+          position: {
+            left: gridster.colToPixels(gridster.getCol(scope.item)),
+            top: gridster.rowToPixels(gridster.getRow(scope.item))
+          }
+        });
+      });
 
-      gridster.translateElementPosition(element, left, top);
+      // initialize item when gridster is loaded
+      scope.$on('ez-gridster.loaded', function() {
+        init();
+      });
+
+      gridster.resolveItem(scope.item);
 
       gridster.addItemElement(scope.item[gridster.getOption('trackByProperty')], element);
 
       if (!gridster.getOption('isLoaded')) {
-
-        // load item on grid load
-        scope.$on('ez-gridster.loaded', function() {
-          load();
-        });
-
-        // load grid if this is the last item
+        // initialize the grid if this is the last item
         if (scope.$parent.$last) {
-          var delay = gridster.getOption('renderDelay');
-
-          gridster.updateGridHeight();
-
-          // give the page some time to load so the transition in is smoother
-          setTimeout(function() {
-            gridster.setLoaded();
-          }, delay);
-
-          // resolve again in case of scrollbars
-          $timeout(function() {
-            gridster.resolveOptions();
-          }, delay + 500);
+          gridster.resolveOptions(true);
         }
       } else {
         // item was pushed into the grid
-        gridster.updateGridHeight();
+        gridster.resolveOptions();
 
-        setTimeout(function() {
-          load();
+        $timeout(function() {
+          init();
+
+          gridster.updateGridHeight();
         }, 100);
-
-        setTimeout(function() {
-          gridster.resolveOptions();
-        }, 500);
       }
-
     }
   };
 }]);

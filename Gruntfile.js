@@ -128,15 +128,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    protractor: {
-      e2e: {
-        options: {
-          configFile: "ptor.conf.js",
-          keepAlive: true,
-          args: {}
-        }
-      }
-    },
     uglify: {
       dist: {
         options: {
@@ -157,10 +148,6 @@ module.exports = function(grunt) {
           reload: true,
           livereload: true,
         }
-      },
-      e2e: { // separate e2e so livereload doesn't have to wait for e2e tests
-        files: ['src/*', 'test/**/*.js'],
-        tasks: ['protractor']
       }
     }
   });
@@ -168,9 +155,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'concat', 'ngtemplates', 'uglify', 'less', 'cssmin']);
 
   grunt.registerTask('dev', ['watch:dev']);
-
-  grunt.registerTask('dev_e2e', ['watch:e2e', 'protractor']);
-
-  grunt.registerTask('test', ['connect:cli', 'karma:singleRun', 'protractor']);
 
 };

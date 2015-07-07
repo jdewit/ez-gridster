@@ -1,7 +1,7 @@
 /**
  * GridsterCtrl
  */
-app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', function($scope, $rootScope, EzGridsterConfig) {
+app.controller('EzGridsterCtrl', ['$scope', '$timeout', 'EzGridsterConfig', function($scope, $timeout, EzGridsterConfig) {
 
   var self = this;
 
@@ -21,19 +21,19 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
   $scope.itemElements = [];
 
   /**
-   * Sets gridster & previewElement elements
+   * Initialize the grid
    */
-  this.load = function($element) {
+  this.init = function($element) {
     $gridElement = $element;
     previewElement = $element[0].querySelector('.gridster-preview-holder');
 
-    // initialize options with gridster config
+    // initialize options object with gridster config
     $scope.options = angular.extend({}, EzGridsterConfig);
 
     // merge user provided options
     $.extend(true, $scope.options, $scope.config);
 
-    this.resolveOptions(true);
+    this.resolveOptions();
 
     if (this.getOption('scrollEdgeEnabled') && !$('.gridster-scroll-edge').length) {
       var $topEdgeEl = angular.element('<div class="gridster-scroll-edge top-edge"></div>');
@@ -46,13 +46,11 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
   };
 
   /**
-   * set gridster as being loaded
+   * Broadcast change event
    */
-  this.setLoaded = function() {
-    $scope.options.isLoaded = true;
-    this.addClass('gridster-loaded');
-    $scope.$emit('ez-gridster.loaded');
-    $scope.$broadcast('ez-gridster.loaded');
+  this.dispatchChangeEvent = function() {
+    $scope.$parent.$emit('ez-gridster.changed');
+    $scope.$parent.$broadcast('ez-gridster.changed');
   };
 
   /**
@@ -126,8 +124,9 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
   /**
    * Resolve options relating to screen size
    */
-  this.resolveOptions = function(isInit) {
+  this.resolveOptions = function(init) {
     var _mode = $scope.options.mode,
+      self = this,
       modeOptions,
       widthChanged = false,
       _width;
@@ -170,7 +169,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
     }
 
     if (this.getOption('colWidth') === 'auto') {
-      $scope.options.curColWidth = $scope.options.curWidth / this.getOption('columns');
+      $scope.options.curColWidth = Math.round($scope.options.curWidth / this.getOption('columns'));
     } else {
       $scope.options.curColWidth = this.getOption('colWidth');
     }
@@ -181,13 +180,42 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
       $scope.options.curRowHeight = this.getOption('rowHeight');
     }
 
-    if ($scope.options.isLoaded) {
-      if (widthChanged && !isInit) {
+    if (!!$scope.options.isLoaded) {
+      if (widthChanged) {
         this.updateGridHeight();
+
         this.setElements();
+
+        $scope.$parent.$broadcast('ez-gridster.resized');
       }
-    } else {
-      this.addClass('gridster-' + $scope.options.mode);
+
+      // need to resolve options again in case scroll-y bar has been added/removed
+      // with change in grid height
+      $timeout(function() {
+        self.resolveOptions();
+      }, 50);
+    } else if (!!init) {
+      $scope.options.isLoaded = true;
+
+      this.updateGridHeight();
+
+      // need to resolve options again in case scroll-y bar has been added/removed
+      // with change in grid height
+      $timeout(function() {
+        self.resolveOptions();
+      }, 50);
+
+      // need to wait to initialize the widgets until the grid width and height have been set
+      // and adjusted if a scrollbar-y appears
+      $timeout(function() {
+        $scope.$parent.$broadcast('ez-gridster.loaded');
+
+        // wait to apply the gridster-loaded class so the position transitions are not applied to the grid items
+        // on initialization
+        $timeout(function() {
+          self.addClass('gridster-loaded');
+        }, 50);
+      }, 100);
     }
   };
 
@@ -279,7 +307,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
   /**
    * Resolve an items position & size values for all view modes
    */
-  this.fixItem = function(item) {
+  this.resolveItem = function(item) {
     var _mode = $scope.options.mode,
       defaultSizeX = this.getOption('defaultSizeX'),
       defaultSizeY = this.getOption('defaultSizeY'),
@@ -585,15 +613,23 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
   /**
    * Returns the row in pixels
    */
-  this.rowToPixels = function(row) {
-    return row * $scope.options.curRowHeight + (2 * this.getOption('padding')[1]);
+  this.rowToPixels = function(row, noPadding) {
+    if (!noPadding) {
+      return row * $scope.options.curRowHeight + (2 * this.getOption('padding')[1]);
+    } else {
+      return row * $scope.options.curRowHeight - (2 * this.getOption('padding')[1]);
+    }
   };
 
   /**
    * Returns the column in pixels
    */
-  this.colToPixels = function(col) {
-    return col * $scope.options.curColWidth + (2 * this.getOption('padding')[0]);
+  this.colToPixels = function(col, noPadding) {
+    if (!noPadding) {
+      return col * $scope.options.curColWidth + (2 * this.getOption('padding')[0]);
+    } else {
+      return col * $scope.options.curColWidth - (2 * this.getOption('padding')[0]);
+    }
   };
 
   /**
@@ -667,13 +703,15 @@ app.controller('EzGridsterCtrl', ['$scope', '$rootScope', 'EzGridsterConfig', fu
       }
 
       el = previewElement;
-    } else {
+    } else if (!!el) {
       if (this.isItemHidden(item)) {
         el.style.display = 'none';
         return;
       } else {
         el.style.display = 'block';
       }
+    } else {
+      return;
     }
 
     this.translateElementPosition(el, this.colToPixels(this.getCol(item)), this.rowToPixels(this.getRow(item)));

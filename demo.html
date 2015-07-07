@@ -34,18 +34,20 @@
 					<a class="pull-right btn btn-primary" ng-click="addWidget()"><i class="glyphicon glyphicon-plus"></i> Add Widget</a>
 					<a class="pull-right btn btn-warning" ng-click="clear()"><i class="glyphicon glyphicon-trash"></i> Clear</a>
 					<h1 style="display: inline-block; width: 200px;">Dashboard</h1>
-					<select class="form-control" style="width: 150px; margin-bottom: 20px; display:inline-block;" ng-change="changeDashboard()" ng-model="dashboard" ng-options="d.name for d in dashboards | orderBy:'id'">
+					<select class="form-control" style="width: 150px; margin-bottom: 20px; display:inline-block;" ng-model="dashboard" ng-options="d.name for d in dashboards | orderBy:'id'">
 					</select>
 				</div>
 				<div ez-gridster="gridsterOptions" items="dashboard.widgets" api="gridster">
-					<div ng-controller="CustomWidgetCtrl" on-load="widgetSet" on-change="widgetSet">
+					<div ng-controller="CustomWidgetCtrl" event-handler="widgetSet">
 						<div class="widget-btns">
 							<a title="settings" ng-click="openSettings()"><i class="glyphicon glyphicon-cog"></i></a>
 							<a title="Remove widget" ng-click="remove()"><i class="glyphicon glyphicon-trash"></i></a>
 						</div>
-						<div ng-switch="item.type">
-							<iframe frameborder="0" scrolling="no" ng-switch-when="iframe" class="grid-content" width="100%" ng-src="{{ src }}"></iframe>
-							<div ng-switch-default class="grid-content" ng-style="{{ style }}"></div>
+						<div ng-switch="item.type" class="grid-content">
+							<iframe frameborder="0" scrolling="no" ng-switch-when="iframe" ng-src="{{ src }}"></iframe>
+              <div ng-switch-default>
+                <img ng-src="{{ src }}"/>
+              </div>
 						</div>
 					</div>
 				</div>

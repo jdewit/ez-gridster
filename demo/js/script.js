@@ -17,8 +17,8 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 			console.log('gridster loaded');
 		});
 
-		$scope.$on('ez-gridster.changed', function() {
-			console.log('gridster changed');
+		$scope.$on('ez-gridster.resized', function() {
+			console.log('gridster resized');
 		});
 
 		$scope.gridsterOptions = {
@@ -70,20 +70,38 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
 		};
 
 		if ($scope.item.src) {
-			$scope.style = {
-				'background-image': 'url("' + $scope.item.src +'")'
-			};
-
 			$scope.src = $sce.trustAsResourceUrl($scope.item.src);
 		}
 
-		$scope.widgetSet = function(e) {
-      console.log('widget set', e);
-			var frames = e.element.find('iframe');
-			if (frames.length) {
-				frames[0].style.height = (e.element.height() - 2) + 'px';
-			}
+    function scaleImage($img, size) {
+      var imgWidth = $img.width();
+      var imgHeight = $img.height();
+      var elRatio = size.height / size.width;
+      var imgRatio = imgHeight / imgWidth;
 
+      $img.width('auto');
+      $img.height('auto');
+
+      if (imgRatio > elRatio) {
+        $img.height(size.height);
+      } else {
+        $img.width(size.width);
+      }
+    }
+
+		$scope.widgetSet = function(widget) {
+      if (widget.event.action === 'drag') {
+        return;
+      }
+
+      if ($scope.item.type === 'iframe') {
+        var frames = widget.element.find('iframe');
+        if (frames.length) {
+          frames[0].style.height = (widget.element.height() - 2) + 'px';
+        }
+      } else {
+        scaleImage(widget.element.find('img').first(), widget.size);
+      }
 		};
 
 		$scope.openSettings = function() {
