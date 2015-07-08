@@ -90,6 +90,8 @@ angular.module('app', ['ui.bootstrap', 'ez.gridster'])
     }
 
 		$scope.widgetSet = function(widget) {
+      console.log('event-handler called', widget);
+
       if (widget.event.action === 'drag') {
         return;
       }

@@ -56,12 +56,13 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
         manualStart: interact.supportsTouch(),
         dynamicDrop: true,
         onstart: function() {
-          gridster.addClass('gridster-moving');
-
           scope.item._moving = true;
           hasChanged = false;
 
           gridster.updateGridHeight(scope.item);
+
+          gridster.addClass('gridster-moving');
+          $element.addClass('gridster-item-moving');
 
           row = gridster.getRow(scope.item);
           col = gridster.getCol(scope.item);
@@ -207,7 +208,6 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
         onend: function() {
           delete scope.item._moving;
 
-
           gridster.removeClass('gridster-moving');
           $element.removeClass('gridster-item-moving');
 
@@ -253,16 +253,12 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
           gridster.updateGridHeight();
         }
       }).actionChecker(function(e, action) {
-        // only left mouse button triggers draggable
-        if (!e || (e.which !== 1 && !interact.supportsTouch())) {
+        // ignore right click
+        if (!!e && e.which === 3 && !interact.supportsTouch()) {
           return false;
         }
 
         return action;
-      }).on('mousedown', function() {
-        $element.addClass('gridster-item-moving');
-      }).on('mouseup', function() {
-        $element.removeClass('gridster-item-moving');
       }).on('hold', function(e) {
         // require tablets to use tab hold to begin interaction
         if (interact.supportsTouch()) {
@@ -270,9 +266,6 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
           var interaction = e.interaction;
 
           if (!interaction.interacting()) {
-
-            $element.addClass('gridster-item-moving');
-
             interaction.start({
               name: 'drag'
             }, e.interactable, e.currentTarget);
