@@ -333,6 +333,10 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
         width = gridster.colToPixels(gridster.getSizeX(scope.item), true);
         height = gridster.rowToPixels(gridster.getSizeY(scope.item), true);
 
+        if (width < 0 || height < 0) {
+          return;
+        }
+
         dispatch({
           hasChanged: gridster.hasItemWidthChanged(scope.item, width) || gridster.hasItemHeightChanged(scope.item, height),
           event: {
