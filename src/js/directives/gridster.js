@@ -17,16 +17,12 @@ app.directive('ezGridster', ['$window', '$timeout', function($window, $timeout) 
       var windowResizeThrottle = null;
 
       // expose gridster methods to parent scope
-      scope.api = {
+      $.extend(true, scope.api, {
         redraw: controller.redraw,
         getNextPosition: controller.getNextPosition,
-        getOption: function(key) {
-          return scope.options[key];
-        },
-        setOption: function(key, val) {
-          scope.options[key] = val;
-        }
-      };
+        getOption: controller.getOption,
+        setOption: controller.setOption
+      });
 
       var resizeCallback = function() {
         controller.resolveOptions();

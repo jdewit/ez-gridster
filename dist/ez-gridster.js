@@ -3,7 +3,7 @@
  * @module ez-gridster
  * 
  * @see 
- * @version 0.4.5
+ * @version 0.4.6
  * @license MIT
  */
 (function(angular) {
@@ -316,7 +316,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$timeout', 'EzGridsterConfig', func
   /**
    * Resolve options relating to screen size
    */
-  this.resolveOptions = function(init) {
+  this.resolveOptions = function(init, preventDoubleCheck) {
     var _mode = $scope.options.mode,
       self = this,
       modeOptions,
@@ -383,9 +383,11 @@ app.controller('EzGridsterCtrl', ['$scope', '$timeout', 'EzGridsterConfig', func
 
       // need to resolve options again in case scroll-y bar has been added/removed
       // with change in grid height
-      $timeout(function() {
-        self.resolveOptions();
-      }, 50);
+      if (!preventDoubleCheck) {
+        $timeout(function() {
+          self.resolveOptions(false, true);
+        }, 50);
+      }
     } else if (!!init) {
       $scope.options.isLoaded = true;
 
@@ -579,7 +581,7 @@ app.controller('EzGridsterCtrl', ['$scope', '$timeout', 'EzGridsterConfig', func
 
     for (var row = 0, rowCount = this.getOption('maxRows'); row <= rowCount; row++) {
       for (var col = 0, columnCount = this.getOption('columns'); col < columnCount; col++) {
-        if (this.canItemOccupy(row, col, sizeX, sizeY, excludeItem)) {
+        if (self.canItemOccupy(row, col, sizeX, sizeY, excludeItem)) {
           return {
             row: row,
             col: col
@@ -1169,16 +1171,12 @@ app.directive('ezGridster', ['$window', '$timeout', function($window, $timeout) 
       var windowResizeThrottle = null;
 
       // expose gridster methods to parent scope
-      scope.api = {
+      $.extend(true, scope.api, {
         redraw: controller.redraw,
         getNextPosition: controller.getNextPosition,
-        getOption: function(key) {
-          return scope.options[key];
-        },
-        setOption: function(key, val) {
-          scope.options[key] = val;
-        }
-      };
+        getOption: controller.getOption,
+        setOption: controller.setOption
+      });
 
       var resizeCallback = function() {
         controller.resolveOptions();
