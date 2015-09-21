@@ -1,6 +1,6 @@
 {
   "name": "ez-gridster",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "dependencies": {
     "angular": "1.2.*",
     "jquery": "1.11.*"
