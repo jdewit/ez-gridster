@@ -9,6 +9,6 @@
     "angular-mocks": "~1.2.0",
     "jquery-simulate": "*",
     "jquery-simulate-ext": "~1.3.0",
-    "interact": "1.2.*"
+    "interact": "1.2.5"
   }
 }

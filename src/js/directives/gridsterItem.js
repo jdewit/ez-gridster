@@ -252,7 +252,7 @@ app.directive('ezGridsterItem', ['$timeout', '$parse', function($timeout, $parse
 
           gridster.updateGridHeight();
         }
-      }).actionChecker(function(e, action) {
+      }).actionChecker(function(e, e2, action) {
         // ignore right click
         if (!!e && e.which === 3 && !interact.supportsTouch()) {
           return false;
